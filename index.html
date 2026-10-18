@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>Worcoin</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;min-height:100dvh;background:radial-gradient(circle,#244968,#101b2c 75%);color:white;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;padding:24px 16px;overflow:hidden}
+h1{font-size:27px;margin:8px;color:#ffd65a}
+.balance{margin-top:22px;text-align:center}
+.label{color:#a9bfd7;font-size:13px;letter-spacing:2px}
+#balance{font-size:38px;font-weight:900;margin-top:8px}
+.coin{margin:auto 0;width:min(76vw,290px);aspect-ratio:1;border-radius:50%;border:8px solid #f5b52f;background:radial-gradient(circle at 35% 25%,#fff1a3,#ffdb5d 30%,#e9a51b 65%,#a85b08);box-shadow:inset 0 0 0 5px #ffec9a,inset 0 0 0 13px #c47b0d,0 13px 0 #75420b,0 22px 35px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;color:#613600;user-select:none;transition:transform .08s}
+.coin:active{transform:scale(.96) translateY(5px)}
+.cobra{font-size:82px;line-height:1}
+.wor{font-size:32px;font-weight:900;letter-spacing:3px;margin-top:8px}
+.hint{color:#b5c8dc;font-size:13px;margin-bottom:20px}
+</style>
+</head>
+<body>
+<h1>WORCOIN</h1>
+<div class="balance">
+<div class="label">YOUR BALANCE</div>
+<div id="balance">0 WOR</div>
+</div>
+<button class="coin" id="coin" aria-label="Tap to earn WOR">
+<span class="cobra">🐍</span>
+<span class="wor">WOR</span>
+</button>
+<div class="hint">👆 TAP THE COIN TO MINE</div>
+<script>
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+let coins=0;
+document.getElementById("coin").addEventListener("click",()=>{
+coins++;
+document.getElementById("balance").textContent=coins.toLocaleString()+" WOR";
+if(tg?.HapticFeedback)tg.HapticFeedback.impactOccurred("light");
+});
+</script>
+</body>
+</html>
