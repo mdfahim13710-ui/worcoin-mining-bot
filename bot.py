@@ -11,7 +11,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
-TOKEN = os.environ.get("BOT_TOKEN")
+TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN") or os.environ.get("BOT_TOKEN")
 ADMIN_ID = 8744701224
 DB_PATH = os.environ.get("DB_PATH", "mining.db")
 
