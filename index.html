@@ -87,7 +87,11 @@ nav button:active{transform:scale(.97)}
 <script>
 const tg=window.Telegram?.WebApp;
 tg?.ready();tg?.expand();
-const KEY="worcoin_v3";
+const tg = window.Telegram?.WebApp;
+const telegramUserId = tg?.initDataUnsafe?.user?.id;
+const KEY = telegramUserId
+  ? `worcoin_v3_user_${telegramUserId}`
+  : "worcoin_v3_guest";
 const BOOST_REWARDS=[0,1,2,6,12,20];
 const BOOST_COSTS=[0,0,2000,6000,12000,20000];
 const ENERGY_MAX=[0,1000,2000,4000,8000,16000];
