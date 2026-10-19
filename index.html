@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,89 +8,144 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:#07090d;color:#fff;font-family:Arial,sans-serif;min-height:100vh;overflow:hidden}
-.app{height:100vh;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 20%,#202020 0,#090b10 45%,#050609 100%)}
-.top{padding:18px 18px 8px;display:flex;justify-content:space-between;align-items:center}
-.logoText{font-size:24px;font-weight:900;letter-spacing:2px}.balance{text-align:right}.balance small{color:#999}.balance b{font-size:22px}
-.page{flex:1;overflow:auto;padding:10px 16px 100px}.screen{display:none}.screen.active{display:block}
-.card{background:#11151c;border:1px solid #242a33;border-radius:18px;padding:16px;margin:10px 0}
+body{margin:0;background:#07090d;color:#fff;font-family:Arial,sans-serif}
+.app{min-height:100dvh;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 15%,#252016,#090b10 50%,#050609)}
+.top{padding:18px;display:flex;justify-content:space-between;align-items:center}
+.logoText{font-size:23px;font-weight:900;letter-spacing:2px;color:#f6ca67;cursor:pointer}
+.balance{text-align:right}.balance small{color:#999}.balance b{font-size:21px}
+.page{flex:1;padding:10px 16px 105px;overflow:auto}
+.screen{display:none}.screen.active{display:block}
+.card,.stat{background:#11151c;border:1px solid #302a1d;border-radius:18px;padding:16px;margin:10px 0}
 .tapArea{text-align:center;margin-top:18px}
-.tapCircle{width:250px;height:250px;border-radius:50%;margin:0 auto;background:#090b0f;border:8px solid #262b32;box-shadow:0 0 35px #000, inset 0 0 30px #000;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none}
-.tapCircle img{width:82%;height:82%;object-fit:contain;border-radius:50%;pointer-events:none}
-.tapHint{margin-top:12px;color:#aaa;font-size:14px}.energy{margin:18px auto;max-width:430px}.energyTop{display:flex;justify-content:space-between;margin-bottom:7px}.bar{height:10px;background:#252a31;border-radius:10px;overflow:hidden}.bar i{display:block;height:100%;background:#fff;border-radius:10px;width:100%}
-.statRow{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#11151c;border:1px solid #242a33;border-radius:14px;padding:12px;text-align:center}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:#999}
-h2{margin:8px 0 14px}.upgrade{display:flex;align-items:center;justify-content:space-between;gap:12px}.upgrade div{flex:1}.upgrade p{margin:4px 0;color:#8f96a3;font-size:12px}.btn{border:0;border-radius:12px;background:#fff;color:#050609;font-weight:800;padding:11px 14px;min-width:95px}.btn:disabled{opacity:.35}
-.nav{position:fixed;left:8px;right:8px;bottom:8px;height:72px;background:#10141aee;border:1px solid #292f38;border-radius:20px;display:grid;grid-template-columns:repeat(5,1fr);padding:7px;backdrop-filter:blur(12px);z-index:10}.nav button{background:none;border:0;color:#777;font-size:10px;font-weight:700}.nav button span{display:block;font-size:23px;margin-bottom:4px}.nav button.active{color:#fff}
-.task,.rank{display:flex;justify-content:space-between;align-items:center;gap:10px}.muted{color:#9299a5;font-size:13px}.rankNo{width:28px}.rankName{flex:1}.rankBal{font-weight:800}.inviteBox{word-break:break-all;background:#080a0e;padding:12px;border-radius:12px;color:#bbb;font-size:12px;margin:10px 0}
-@media(max-width:360px){.tapCircle{width:210px;height:210px}.nav{height:68px}.nav button span{font-size:20px}}
+.tapCircle{position:relative;width:250px;height:250px;border-radius:50%;margin:auto;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;background:radial-gradient(circle at 35% 25%,#fff1b0 0%,#f7d77c 13%,#dba536 43%,#8e5b0d 72%,#f9d46c 83%,#5e3908 100%);border:5px solid #f8df91;box-shadow:0 0 25px #c78b2766,0 0 55px #c78b2725,inset 0 0 0 5px #8e5b0d,inset 0 0 18px #fff2b0}
+.coinInner{width:78%;height:78%;border:3px solid #8e5b0d;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#714508;text-shadow:0 1px #fff0a0;background:linear-gradient(145deg,#ffe9a0,#dba438 65%,#fbe7a0);box-shadow:inset 0 0 12px #fff4b8}
+.coinA{font-size:100px;font-weight:1000;line-height:.9;font-family:Arial,sans-serif}
+.coinName{font-weight:900;letter-spacing:3px;font-size:14px;margin-top:7px}
+.tapCircle:active{transform:scale(.97)}
+.tapHint{margin-top:12px;color:#b9a77c;font-size:13px}
+.energy{margin:20px auto;max-width:430px}
+.energyTop{display:flex;justify-content:space-between;margin-bottom:7px}
+.bar{height:10px;background:#252a31;border-radius:10px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#b78020,#ffe08a);border-radius:10px;width:100%}
+.statRow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{text-align:center;padding:12px 4px}
+.stat b{display:block;font-size:18px;color:#f6cf71}
+.stat span{font-size:10px;color:#999}
+h2{margin:8px 0 14px}
+.upgrade,.task,.rank{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.upgrade>div,.rankName{flex:1}
+.upgrade p{margin:5px 0;color:#9299a5;font-size:12px}
+.btn{border:0;border-radius:12px;background:linear-gradient(135deg,#ffe8a0,#d49a28);color:#281903;font-weight:900;padding:11px 13px;min-width:90px}
+.btn:disabled{opacity:.4}
+.muted{color:#9299a5;font-size:13px}
+.inviteBox{word-break:break-all;background:#080a0e;padding:12px;border-radius:12px;color:#bbb;font-size:12px;margin:10px 0}
+.nav{position:fixed;left:8px;right:8px;bottom:8px;height:72px;background:#10141aee;border:1px solid #39301e;border-radius:20px;display:grid;grid-template-columns:repeat(5,1fr);padding:6px;backdrop-filter:blur(12px);z-index:10}
+.nav button{background:none;border:0;color:#777;font-size:10px;font-weight:700}
+.nav button span{display:block;font-size:22px;margin-bottom:4px}
+.nav button.active{color:#f5ce70}
+.adminInput{width:100%;padding:12px;background:#080a0e;border:1px solid #444;color:white;border-radius:10px;margin:8px 0}
+#coinLogoImg{width:100%;height:100%;object-fit:contain;border-radius:50%}
+.floatCoin{position:absolute;pointer-events:none;color:#ffe18a;font-weight:900;font-size:20px;animation:floatup .7s ease-out forwards;z-index:3}
+@keyframes floatup{from{opacity:1;transform:translateY(0) scale(.8)}to{opacity:0;transform:translateY(-75px) scale(1.2)}}
+@media(max-width:360px){.tapCircle{width:210px;height:210px}.coinA{font-size:82px}.nav{height:68px}.nav button span{font-size:20px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="logoText">WORCOIN</div><div class="balance"><small>BALANCE</small><br><b id="topBalance">0 WOR</b></div></div>
+<header class="top">
+  <div class="logoText" id="brandTitle">WORCOIN</div>
+  <div class="balance"><small>BALANCE</small><br><b id="topBalance">0 WOR</b></div>
+</header>
 
-  <main class="page">
-    <section id="home" class="screen active">
-      <div class="tapArea">
-        <div id="tapCircle" class="tapCircle"><img id="coinLogo" src="wor-logo.png" alt="WORCOIN"></div>
-        <div class="tapHint">Tap with multiple fingers to mine</div>
+<main class="page">
+<section id="home" class="screen active">
+  <div class="tapArea">
+    <div id="tapCircle" class="tapCircle">
+      <div class="coinInner" id="coinFace">
+        <div class="coinA">A</div>
+        <div class="coinName">WORCOIN</div>
       </div>
-      <div class="energy">
-        <div class="energyTop"><span>⚡ Energy</span><b id="energyText">1000 / 1000</b></div>
-        <div class="bar"><i id="energyBar"></i></div>
-      </div>
-      <div class="statRow">
-        <div class="stat"><b id="tapPower">1</b><span>MINING POWER</span></div>
-        <div class="stat"><b id="levelText">1</b><span>LEVEL</span></div>
-        <div class="stat"><b id="boostText">1</b><span>BOOST</span></div>
-      </div>
-    </section>
+    </div>
+    <div class="tapHint">✨ TAP TO MINE WORCOIN</div>
+  </div>
+  <div class="energy">
+    <div class="energyTop"><span>⚡ Energy</span><b id="energyText">1000 / 1000</b></div>
+    <div class="bar"><i id="energyBar"></i></div>
+  </div>
+  <div class="statRow">
+    <div class="stat"><b id="tapPower">1</b><span>MINING POWER</span></div>
+    <div class="stat"><b id="levelText">1</b><span>MINING LEVEL</span></div>
+    <div class="stat"><b id="boostText">1</b><span>BOOST LEVEL</span></div>
+  </div>
+</section>
 
-    <section id="mine" class="screen">
-      <h2>⛏️ Mine</h2>
-      <div class="card upgrade"><div><b>🚀 Boost</b><p>Increase coins earned per tap.</p><strong>Level <span id="boostLevel">1</span></strong></div><button class="btn" id="boostBtn">Upgrade</button></div>
-      <div class="card upgrade"><div><b>⛏️ Mining</b><p>Increase mining power.</p><strong>Level <span id="miningLevel">1</span></strong></div><button class="btn" id="miningBtn">Upgrade</button></div>
-      <div class="card upgrade"><div><b>🔋 Energy</b><p>Increase maximum energy.</p><strong><span id="energyMax">1000</span> max</strong></div><button class="btn" id="energyBtn">Upgrade</button></div>
-      <p class="muted">Upgrades use your WOR balance.</p>
-    </section>
+<section id="mine" class="screen">
+  <h2>⛏️ Mine Upgrades</h2>
+  <div class="card upgrade"><div><b>🚀 Boost</b><p>Increase coins per tap.</p><strong>Level <span id="boostLevel">1</span></strong><p>Cost: <span id="boostCost">100</span> WOR</p></div><button class="btn" id="boostBtn">Upgrade</button></div>
+  <div class="card upgrade"><div><b>⛏️ Mining</b><p>Increase mining power.</p><strong>Level <span id="miningLevel">1</span></strong><p>Cost: <span id="miningCost">150</span> WOR</p></div><button class="btn" id="miningBtn">Upgrade</button></div>
+  <div class="card upgrade"><div><b>🔋 Energy</b><p>Increase maximum energy.</p><strong><span id="energyMax">1000</span> max</strong><p>Cost: <span id="energyCost">500</span> WOR</p></div><button class="btn" id="energyBtn">Upgrade</button></div>
+</section>
 
-    <section id="invite" class="screen">
-      <h2>👥 Invite Friend</h2>
-      <div class="card"><h3>Invite friends & earn</h3><p class="muted">Share your personal referral link.</p><div class="inviteBox" id="inviteLink">Loading...</div><button class="btn" id="shareBtn">Invite Friend</button></div>
-    </section>
+<section id="invite" class="screen">
+  <h2>👥 Invite Friends</h2>
+  <div class="card"><h3>Invite friends & earn</h3><p class="muted">Share your personal referral link.</p><div class="inviteBox" id="inviteLink">Loading...</div><button class="btn" id="shareBtn">Share Invite</button></div>
+</section>
 
-    <section id="task" class="screen">
-      <h2>📋 Tasks</h2>
-      <div class="card task"><div><b>Join WORCOIN Channel</b><p class="muted">Join the official channel</p></div><button class="btn" id="channelBtn">Open</button></div>
-      <div class="card task"><div><b>🎁 Daily Bonus</b><p class="muted">Daily reward</p></div><button class="btn" id="dailyBtn">Claim</button></div>
-    </section>
+<section id="task" class="screen">
+  <h2>📋 Tasks</h2>
+  <div class="card task"><div><b>Join WORCOIN Channel</b><p class="muted">Join our official channel.</p></div><button class="btn" id="channelBtn">Open</button></div>
+  <div class="card task"><div><b>🎁 Daily Bonus</b><p class="muted">Claim once per day.</p></div><button class="btn" id="dailyBtn">Claim</button></div>
+  <p class="muted">Channel membership verification requires a trusted bot backend.</p>
+</section>
 
-    <section id="rank" class="screen">
-      <h2>🏆 Rank — Top 100</h2>
-      <div id="rankList"><div class="card muted">Ranking will connect to the server.</div></div>
-    </section>
-  </main>
+<section id="rank" class="screen">
+  <h2>🏆 Rank — Top 100</h2>
+  <div class="card muted">Live ranking will appear after server integration.</div>
+</section>
 
-  <nav class="nav">
-    <button data-page="home" class="active"><span>🏠</span>Home</button>
-    <button data-page="mine"><span>⛏️</span>Mine</button>
-    <button data-page="invite"><span>👥</span>Invite</button>
-    <button data-page="task"><span>📋</span>Task</button>
-    <button data-page="rank"><span>🏆</span>Rank</button>
-  </nav>
+<section id="admin" class="screen">
+  <h2>⚙️ Logo Settings</h2>
+  <div class="card">
+    <p class="muted">Local preview only. This setting changes the logo on this device, not for every player.</p>
+    <label for="logoFile">Choose a logo image</label>
+    <input class="adminInput" id="logoFile" type="file" accept="image/png,image/jpeg,image/webp">
+    <button class="btn" id="resetLogo">Use Gold WORCOIN Coin</button>
+    <p class="muted">A secure admin login and server storage are needed for global changes.</p>
+    <button class="btn" id="backHome">Back to Home</button>
+  </div>
+</section>
+</main>
+
+<nav class="nav" id="mainNav">
+  <button data-page="home" class="active"><span>🏠</span>Home</button>
+  <button data-page="mine"><span>⛏️</span>Mining</button>
+  <button data-page="invite"><span>👥</span>Friend</button>
+  <button data-page="task"><span>📋</span>Task</button>
+  <button data-page="rank"><span>🏆</span>Rank</button>
+</nav>
 </div>
 
 <script>
 const tg=window.Telegram?.WebApp;
-tg?.ready(); tg?.expand();
+tg?.ready();tg?.expand();
 
-const saved=JSON.parse(localStorage.getItem("worcoin_v3")||"null");
-const s=saved||{balance:0,energy:1000,maxEnergy:1000,miningLevel:1,boostLevel:1,lastDaily:""};
+const KEY="worcoin_v3";
+let s;
+try{s=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){s=null}
+if(!s)s={balance:0,energy:1000,maxEnergy:1000,miningLevel:1,boostLevel:1,lastDaily:""};
+s.balance=Number(s.balance)||0;
+s.maxEnergy=Math.max(1000,Number(s.maxEnergy)||1000);
+s.energy=Math.max(0,Math.min(s.maxEnergy,Number(s.energy)||0));
+s.miningLevel=Math.max(1,Number(s.miningLevel)||1);
+s.boostLevel=Math.max(1,Number(s.boostLevel)||1);
+
 const $=id=>document.getElementById(id);
-function save(){localStorage.setItem("worcoin_v3",JSON.stringify(s));render()}
+function save(){localStorage.setItem(KEY,JSON.stringify(s));render()}
 function power(){return s.miningLevel*s.boostLevel}
+function costs(){return {boost:s.boostLevel*100,mining:s.miningLevel*150,energy:Math.max(100,Math.floor(s.maxEnergy/2))}}
+
 function render(){
- $("topBalance").textContent=Math.floor(s.balance)+" WOR";
+ $("topBalance").textContent=Math.floor(s.balance).toLocaleString()+" WOR";
  $("energyText").textContent=Math.floor(s.energy)+" / "+s.maxEnergy;
  $("energyBar").style.width=Math.max(0,Math.min(100,s.energy/s.maxEnergy*100))+"%";
  $("tapPower").textContent=power();
@@ -98,49 +154,130 @@ function render(){
  $("boostLevel").textContent=s.boostLevel;
  $("miningLevel").textContent=s.miningLevel;
  $("energyMax").textContent=s.maxEnergy;
- $("dailyBtn").textContent=s.lastDaily===new Date().toDateString()?"Claimed":"Claim";
- $("dailyBtn").disabled=s.lastDaily===new Date().toDateString();
+ const c=costs();
+ $("boostCost").textContent=c.boost;
+ $("miningCost").textContent=c.mining;
+ $("energyCost").textContent=c.energy;
+ $("boostBtn").disabled=s.balance<c.boost;
+ $("miningBtn").disabled=s.balance<c.mining;
+ $("energyBtn").disabled=s.balance<c.energy;
+ const claimed=s.lastDaily===new Date().toDateString();
+ $("dailyBtn").textContent=claimed?"Claimed":"Claim";
+ $("dailyBtn").disabled=claimed;
 }
-document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{
+function showPage(id){
  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
- document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
- $(b.dataset.page).classList.add("active"); b.classList.add("active");
+ document.querySelectorAll("#mainNav button").forEach(x=>x.classList.remove("active"));
+ $(id).classList.add("active");
+ const nav=document.querySelector('#mainNav button[data-page="'+id+'"]');
+ if(nav)nav.classList.add("active");
  tg?.HapticFeedback?.impactOccurred("light");
-});
+}
+document.querySelectorAll("#mainNav button").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
 
+/* Every valid finger pointerdown can earn separately while energy remains. */
 $("tapCircle").addEventListener("pointerdown",e=>{
- if(e.pointerType==="mouse" && e.button!==0)return;
+ if(e.pointerType==="mouse"&&e.button!==0)return;
  e.preventDefault();
  if(s.energy<1)return;
  s.balance+=power();
  s.energy-=1;
+ const r=$("tapCircle").getBoundingClientRect();
+ const f=document.createElement("span");
+ f.className="floatCoin";
+ f.textContent="+"+power()+" WOR";
+ f.style.left=(e.clientX-r.left-25)+"px";
+ f.style.top=(e.clientY-r.top-10)+"px";
+ $("tapCircle").appendChild(f);
+ setTimeout(()=>f.remove(),750);
  tg?.HapticFeedback?.impactOccurred("light");
- render(); localStorage.setItem("worcoin_v3",JSON.stringify(s));
+ save();
 });
-setInterval(()=>{if(s.energy<s.maxEnergy){s.energy=Math.min(s.maxEnergy,s.energy+1);render();localStorage.setItem("worcoin_v3",JSON.stringify(s))}},3000);
+
+setInterval(()=>{
+ if(s.energy<s.maxEnergy){
+  s.energy=Math.min(s.maxEnergy,s.energy+1);
+  localStorage.setItem(KEY,JSON.stringify(s));
+  render();
+ }
+},3000);
 
 function upgrade(type){
- let cost;
- if(type==="boost"){cost=s.boostLevel*100;if(s.balance<cost)return; s.balance-=cost;s.boostLevel++}
- if(type==="mining"){cost=s.miningLevel*150;if(s.balance<cost)return;s.balance-=cost;s.miningLevel++}
- if(type==="energy"){cost=Math.max(100,Math.floor(s.maxEnergy/2));if(s.balance<cost)return;s.balance-=cost;s.maxEnergy+=250;s.energy+=250}
- save(); tg?.HapticFeedback?.notificationOccurred("success");
+ const c=costs()[type];
+ if(s.balance<c)return;
+ s.balance-=c;
+ if(type==="boost")s.boostLevel++;
+ if(type==="mining")s.miningLevel++;
+ if(type==="energy"){s.maxEnergy+=250;s.energy=Math.min(s.maxEnergy,s.energy+250)}
+ save();
+ tg?.HapticFeedback?.notificationOccurred("success");
 }
 $("boostBtn").onclick=()=>upgrade("boost");
 $("miningBtn").onclick=()=>upgrade("mining");
 $("energyBtn").onclick=()=>upgrade("energy");
 
 const uid=tg?.initDataUnsafe?.user?.id||"demo";
-$("inviteLink").textContent=`https://t.me/WORMiningBot?start=ref_${uid}`;
-$("shareBtn").onclick=()=>{
+$("inviteLink").textContent="https://t.me/WORMiningBot?start=ref_"+uid;
+$("shareBtn").onclick=async()=>{
  const link=$("inviteLink").textContent;
- if(navigator.share) navigator.share({title:"WORCOIN",text:"Join WORCOIN",url:link});
- else navigator.clipboard?.writeText(link).then(()=>alert("Invite link copied"));
+ if(tg?.openTelegramLink){
+  tg.openTelegramLink("https://t.me/share/url?url="+encodeURIComponent(link)+"&text="+encodeURIComponent("Join WORCOIN"));
+ }else if(navigator.share){
+  try{await navigator.share({title:"WORCOIN",text:"Join WORCOIN",url:link})}catch(e){}
+ }else{
+  try{await navigator.clipboard.writeText(link);alert("Invite link copied")}catch(e){alert(link)}
+ }
 };
-$("channelBtn").onclick=()=>window.open("https://t.me/owlcoin137","_blank");
+$("channelBtn").onclick=()=>tg?.openTelegramLink?tg.openTelegramLink("https://t.me/owlcoin137"):window.open("https://t.me/owlcoin137","_blank");
 $("dailyBtn").onclick=()=>{
  if(s.lastDaily===new Date().toDateString())return;
  s.balance+=100;s.lastDaily=new Date().toDateString();save();
+};
+
+/* Admin preview: tap the WORCOIN heading 5 times.
+   This is NOT secure authentication; local-only settings. */
+let logoTaps=0,logoTapTimer;
+$("brandTitle").addEventListener("click",()=>{
+ logoTaps++;
+ clearTimeout(logoTapTimer);
+ logoTapTimer=setTimeout(()=>logoTaps=0,1800);
+ if(logoTaps>=5){logoTaps=0;showPage("admin")}
+});
+$("backHome").onclick=()=>showPage("home");
+
+const LOGO_KEY="worcoin_custom_logo";
+function applyLogo(data){
+ const face=$("coinFace");
+ if(data){
+  face.innerHTML="";
+  const img=document.createElement("img");
+  img.id="coinLogoImg";
+  img.alt="WORCOIN logo";
+  img.src=data;
+  face.appendChild(img);
+ }else{
+  face.innerHTML='<div class="coinA">A</div><div class="coinName">WORCOIN</div>';
+ }
+}
+try{applyLogo(localStorage.getItem(LOGO_KEY))}catch(e){applyLogo(null)}
+$("logoFile").addEventListener("change",e=>{
+ const file=e.target.files?.[0];
+ if(!file)return;
+ if(file.size>1500000){alert("Please choose an image under 1.5 MB.");e.target.value="";return}
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   localStorage.setItem(LOGO_KEY,reader.result);
+   applyLogo(reader.result);
+   alert("Logo preview updated on this device.");
+  }catch(err){alert("Image is too large to save on this device.")}
+ };
+ reader.readAsDataURL(file);
+});
+$("resetLogo").onclick=()=>{
+ localStorage.removeItem(LOGO_KEY);
+ applyLogo(null);
+ $("logoFile").value="";
 };
 render();
 </script>
