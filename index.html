@@ -1,286 +1,391 @@
 
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>WORCOIN Mining</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#07111f;color:#fff;font-family:Arial,sans-serif;padding:16px}
-header{text-align:center;color:#f5c451;font-size:26px;font-weight:bold;margin:10px}
-.sub{text-align:center;color:#9eafc7;margin-bottom:20px}
-.card{background:#101f32;border:1px solid #263b52;border-radius:16px;padding:18px;margin:12px 0}
-.balance{text-align:center;font-size:34px;color:#f5c451;font-weight:bold}
-.small{text-align:center;color:#a8b6c9;font-size:13px}
+:root{--bg:#050609;--card:#101724;--line:#273346;--gold:#f5c451;--red:#ff1938;--muted:#a4a9b8}
+body{margin:0;background:var(--bg);color:white;font-family:Arial,sans-serif;padding:12px 12px calc(100px + env(safe-area-inset-bottom))}
+header{text-align:center;color:var(--gold);font-size:26px;font-weight:bold;margin:12px 0 5px}
+.sub{text-align:center;color:#9eafc7;font-size:12px;letter-spacing:2px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px;margin:12px 0}
+.balance{text-align:center;font-size:32px;color:var(--gold);font-weight:bold;overflow-wrap:anywhere}
+.small{text-align:center;color:#a8b6c9;font-size:13px;line-height:1.6}
 .energybar{height:12px;background:#26384b;border-radius:20px;overflow:hidden;margin:12px 0}
-#energyFill{height:100%;width:100%;background:#35d69b;transition:width .2s}
-.tap{display:block;margin:20px auto;width:180px;height:180px;border-radius:50%;border:5px solid #f5c451;background:radial-gradient(circle,#344b63,#102033);color:#f5c451;font-size:24px;font-weight:bold;box-shadow:0 0 25px #dcae3540}
+#energyFill{height:100%;width:100%;background:#35d69b;transition:width .15s}
+.tap{
+ display:block;margin:22px auto;
+ width:min(294px,78vw);height:min(294px,78vw);
+ border-radius:50%;border:6px solid var(--gold);
+ background:radial-gradient(circle at 40% 35%,#536b87,#14243a 72%);
+ color:var(--gold);font-size:30px;font-weight:bold;
+ box-shadow:0 0 35px #f5c45155,inset 0 0 25px #0007;
+ touch-action:manipulation;user-select:none;-webkit-user-select:none;
+ -webkit-tap-highlight-color:transparent;
+}
+.tap:active{transform:scale(.97);box-shadow:0 0 45px #f5c45199}
 button{cursor:pointer}
-.action{width:100%;padding:13px;border:0;border-radius:10px;background:#f5c451;color:#101827;font-size:15px;font-weight:bold;margin-top:10px}
+.action{width:100%;padding:13px;border:0;border-radius:10px;background:var(--gold);color:#101827;font-size:14px;font-weight:bold;margin-top:10px}
 .action:disabled{opacity:.4}
-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0}
-nav button{padding:11px 3px;background:#17283b;color:white;border:1px solid #30445a;border-radius:9px;font-size:12px}
-nav button.active{background:#f5c451;color:#111}
-.page{display:none}.page.active{display:block}
+.page{display:none}
+.page.active{display:block}
 .upgrade{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .upgrade h3{margin:0 0 6px;font-size:16px}
-.upgrade p{margin:0;color:#a8b6c9;font-size:13px;line-height:1.5}
-.upgrade button{min-width:90px;padding:11px 8px;border:0;border-radius:9px;background:#f5c451;font-weight:bold}
-.notice{text-align:center;color:#a8b6c9;font-size:12px;margin:14px}
+.upgrade p{margin:0;color:#a8b6c9;font-size:13px;line-height:1.6}
+.upgrade button{min-width:90px;padding:11px 8px;border:0;border-radius:9px;background:var(--gold);font-weight:bold}
+.upgrade button:disabled{opacity:.4}
+.notice{text-align:center;color:var(--muted);font-size:12px;line-height:1.6;margin:14px 0}
+.section-title{font-size:20px;margin:4px 0 14px}
+.feature-icon{font-size:38px;text-align:center;margin:8px}
+nav{
+ position:fixed;z-index:1000;left:0;right:0;bottom:0;
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+ gap:0;margin:0;padding:10px 5px calc(8px + env(safe-area-inset-bottom));
+ background:linear-gradient(180deg,#08090d,#030305);
+ border:1px solid #46131c;border-radius:25px 25px 0 0;
+ box-shadow:0 -2px 15px #ff19381c;
+}
+nav button{
+ min-width:0;min-height:74px;border:0;border-radius:12px;
+ background:transparent;color:#a6a9b5;padding:5px 0;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:5px;font-size:clamp(10px,3vw,14px);font-weight:500;
+ -webkit-tap-highlight-color:transparent;
+}
+.nav-icon{font-size:clamp(23px,6vw,35px);line-height:1.15;filter:grayscale(1);opacity:.9}
+nav button.active{
+ color:var(--red);
+ background:linear-gradient(180deg,#ff193817,transparent);
+ text-shadow:0 0 12px #ff1938a0;
+ box-shadow:inset 0 -3px 0 var(--red),0 5px 12px #ff19381c;
+}
+nav button.active .nav-icon{filter:none;opacity:1;text-shadow:0 0 14px #ff1938}
+nav button:active{transform:scale(.97)}
+@media(max-width:350px){
+ nav button{min-height:68px}
+ .tap{width:min(260px,78vw);height:min(260px,78vw)}
+}
 </style>
 </head>
 <body>
+
 <header>🪙 WORCOIN</header>
 <div class="sub">MINING ECOSYSTEM</div>
 
 <div class="card">
-  <div class="small">YOUR BALANCE</div>
-  <div class="balance"><span id="balance">0</span> WOR</div>
-  <div class="small">Mining Level: <span id="miningLevel">1</span> · Boost Level: <span id="boostLevel">1</span></div>
+ <div class="small">YOUR BALANCE</div>
+ <div class="balance"><span id="balance">0</span> WOR</div>
+ <div class="small">
+ Mining Level: <span id="miningLevel">1</span>
+ · Boost Level: <span id="boostLevel">1</span>
+ </div>
 </div>
 
-<nav>
-  <button class="active" data-page="home">Home</button>
-  <button data-page="upgradePage">Upgrade</button>
-  <button data-page="tasksPage">Tasks</button>
-  <button data-page="rankPage">Rank</button>
+<!-- HOME -->
+<section id="home" class="page active">
+ <div class="card">
+  <div class="small">ENERGY</div>
+  <div style="text-align:center;font-size:22px;margin-top:6px">
+   <span id="energy">1000</span> / <span id="maxEnergy">1000</span>
+  </div>
+  <div class="energybar"><div id="energyFill"></div></div>
+  <div class="small">Recharge: <span id="regen">1</span> energy/second</div>
+  <button class="tap" id="tapButton">🪙 TAP</button>
+  <div class="small">Earn <span id="tapReward">1</span> WOR per tap</div>
+  <div class="small" id="tapMessage">Tap to mine WORCOIN</div>
+ </div>
+ <div class="card">
+  <h3>🎁 Daily Reward</h3>
+  <p class="small">Claim your daily reward once per day.</p>
+  <button class="action" id="dailyButton">CLAIM +100 WOR</button>
+ </div>
+</section>
+
+<!-- MINE -->
+<section id="minePage" class="page">
+ <h2 class="section-title">⛏️ Mine & Upgrade</h2>
+ <div class="card">
+  <h2>⚡ Tap Boost</h2>
+  <div class="upgrade"><div>
+   <h3 id="boostTitle">Level 1</h3>
+   <p id="boostInfo">1 WOR per tap</p>
+   <p id="boostCost">Next upgrade: 2,000 WOR</p>
+  </div><button id="boostButton">UPGRADE</button></div>
+ </div>
+ <div class="card">
+  <h2>🔋 Energy Capacity</h2>
+  <div class="upgrade"><div>
+   <h3 id="energyTitle">Level 1</h3>
+   <p id="energyInfo">Maximum 1,000 energy</p>
+   <p id="energyCost">Next upgrade: 4,000 WOR</p>
+  </div><button id="energyButton">UPGRADE</button></div>
+ </div>
+ <div class="card">
+  <h2>⛏️ Mining Speed</h2>
+  <div class="upgrade"><div>
+   <h3 id="miningTitle">Level 1</h3>
+   <p id="miningInfo">1 energy per second</p>
+   <p id="miningCost">Next upgrade: 3,000 WOR</p>
+  </div><button id="miningButton">UPGRADE</button></div>
+ </div>
+</section>
+
+<!-- FRIENDS -->
+<section id="friendsPage" class="page">
+ <div class="card">
+  <div class="feature-icon">👥</div>
+  <h2 style="text-align:center">Invite Friends</h2>
+  <p class="small">Invite friends to discover WORCOIN.</p>
+  <button class="action" id="inviteButton">INVITE FRIENDS</button>
+  <p class="notice">Referral rewards require server-side referral verification.</p>
+ </div>
+</section>
+
+<!-- TASKS -->
+<section id="tasksPage" class="page">
+ <div class="card">
+  <div class="feature-icon">☑️</div>
+  <h2 style="text-align:center">Tasks</h2>
+  <p class="small">Join the WORCOIN community to stay updated.</p>
+  <button class="action" id="channelButton">OPEN TELEGRAM CHANNEL</button>
+  <p class="notice">Automatic channel verification and claim rewards are not connected yet.</p>
+ </div>
+</section>
+
+<!-- AIRDROP -->
+<section id="airdropPage" class="page">
+ <div class="card">
+  <div class="feature-icon">🪂</div>
+  <h2 style="text-align:center">WORCOIN Airdrop</h2>
+  <p class="small">Airdrop information will appear here when available.</p>
+  <p class="notice">Airdrop eligibility and claim functions require backend integration.</p>
+ </div>
+ <div class="card">
+  <h3>🏆 WORCOIN Ranking</h3>
+  <p class="small">Live Top 100 ranking requires a connected database.</p>
+ </div>
+</section>
+
+<!-- BOTTOM MENU -->
+<nav id="bottomNav">
+ <button class="active" data-page="home" aria-current="page">
+  <span class="nav-icon">🏠</span><span>Home</span>
+ </button>
+ <button data-page="minePage">
+  <span class="nav-icon">⛏️</span><span>Mine</span>
+ </button>
+ <button data-page="friendsPage">
+  <span class="nav-icon">👥</span><span>Friends</span>
+ </button>
+ <button data-page="tasksPage">
+  <span class="nav-icon">☑️</span><span>Tasks</span>
+ </button>
+ <button data-page="airdropPage">
+  <span class="nav-icon">🪂</span><span>Airdrop</span>
+ </button>
 </nav>
 
-<section id="home" class="page active">
-  <div class="card">
-    <div class="small">ENERGY</div>
-    <div style="text-align:center;font-size:22px;margin-top:6px">
-      <span id="energy">1000</span> / <span id="maxEnergy">1000</span>
-    </div>
-    <div class="energybar"><div id="energyFill"></div></div>
-    <div class="small">Recharge: <span id="regen">1</span> energy/second</div>
-    <button class="tap" id="tapButton">🪙 TAP</button>
-    <div class="small">Earn <span id="tapReward">1</span> WOR per tap</div>
-  </div>
-  <div class="card">
-    <h3>🎁 Daily Reward</h3>
-    <p class="small">Claim your daily reward once per day.</p>
-    <button class="action" id="dailyButton">CLAIM +100 WOR</button>
-  </div>
-</section>
-
-<section id="upgradePage" class="page">
-  <div class="card">
-    <h2>⚡ Tap Boost</h2>
-    <div class="upgrade">
-      <div><h3 id="boostTitle">Level 1</h3><p id="boostInfo">1 WOR per tap</p><p id="boostCost">Next upgrade: 2,000 WOR</p></div>
-      <button id="boostButton">UPGRADE</button>
-    </div>
-  </div>
-  <div class="card">
-    <h2>🔋 Energy Capacity</h2>
-    <div class="upgrade">
-      <div><h3 id="energyTitle">Level 1</h3><p id="energyInfo">Maximum 1,000 energy</p><p id="energyCost">Next upgrade: 4,000 WOR</p></div>
-      <button id="energyButton">UPGRADE</button>
-    </div>
-  </div>
-  <div class="card">
-    <h2>⛏️ Mining Speed</h2>
-    <div class="upgrade">
-      <div><h3 id="miningTitle">Level 1</h3><p id="miningInfo">1 energy per second</p><p id="miningCost">Next upgrade: 3,000 WOR</p></div>
-      <button id="miningButton">UPGRADE</button>
-    </div>
-  </div>
-</section>
-
-<section id="tasksPage" class="page">
-  <div class="card">
-    <h2>📋 Tasks</h2>
-    <p>Join the WORCOIN community to stay updated.</p>
-    <button class="action" id="channelButton">OPEN TELEGRAM CHANNEL</button>
-    <p class="notice">Channel join verification and task rewards require server integration.</p>
-  </div>
-</section>
-
-<section id="rankPage" class="page">
-  <div class="card">
-    <h2>🏆 WORCOIN Ranking</h2>
-    <p class="small">Live ranking requires a connected server and database.</p>
-  </div>
-</section>
-
-<div class="notice">Demo version · Balance is currently stored on this device.</div>
-
 <script>
-const tg = window.Telegram?.WebApp;
+const tg=window.Telegram?.WebApp;
 tg?.ready();
 tg?.expand();
 
-const KEY = "worcoin_v3";
+const KEY="worcoin_v3";
 
-/* Boost Level 1–5 */
-const BOOST_REWARDS = [0, 1, 2, 6, 12, 20];
-const BOOST_COSTS   = [0, 0, 2000, 6000, 12000, 20000];
-
-/* Energy capacity Level 1–5 */
-const ENERGY_MAX   = [0, 1000, 2000, 4000, 8000, 16000];
-const ENERGY_COSTS = [0, 0, 4000, 8000, 16000, 32000];
-
-/* Mining recharge Level 1–5 */
-const MINING_REGEN = [0, 1, 2, 3, 8, 16];
-const MINING_COSTS = [0, 0, 3000, 6000, 16000, 50000];
+const BOOST_REWARDS=[0,1,2,6,12,20];
+const BOOST_COSTS=[0,0,2000,6000,12000,20000];
+const ENERGY_MAX=[0,1000,2000,4000,8000,16000];
+const ENERGY_COSTS=[0,0,4000,8000,16000,32000];
+const MINING_REGEN=[0,1,2,3,8,16];
+const MINING_COSTS=[0,0,3000,6000,16000,50000];
 
 function loadState(){
-  let old;
-  try { old = JSON.parse(localStorage.getItem(KEY) || "{}"); }
-  catch { old = {}; }
+ let old;
+ try{old=JSON.parse(localStorage.getItem(KEY)||"{}")}
+ catch{old={}}
 
-  const miningLevel = Math.max(1, Math.min(5, Number(old.miningLevel) || 1));
-  const boostLevel = Math.max(1, Math.min(5, Number(old.boostLevel) || 1));
+ const miningLevel=Math.max(1,Math.min(5,Number(old.miningLevel)||1));
+ const boostLevel=Math.max(1,Math.min(5,Number(old.boostLevel)||1));
+ let energyLevel=Number(old.energyLevel)||0;
 
-  let energyLevel = Number(old.energyLevel) || 0;
-  if (!energyLevel) {
-    const oldMax = Number(old.maxEnergy) || 1000;
-    energyLevel = ENERGY_MAX.findIndex((v, i) => i > 0 && v >= oldMax);
-    if (energyLevel < 1) energyLevel = 1;
-  }
-  energyLevel = Math.max(1, Math.min(5, energyLevel));
+ if(!energyLevel){
+  const oldMax=Number(old.maxEnergy)||1000;
+  energyLevel=ENERGY_MAX.findIndex((v,i)=>i>0&&v>=oldMax);
+  if(energyLevel<1)energyLevel=1;
+ }
+ energyLevel=Math.max(1,Math.min(5,energyLevel));
 
-  return {
-    balance: Math.max(0, Number(old.balance) || 0),
-    energy: Math.max(0, Number(old.energy ?? ENERGY_MAX[energyLevel])),
-    energyLevel,
-    boostLevel,
-    miningLevel,
-    lastDaily: old.lastDaily || "",
-    lastRegen: Number(old.lastRegen) || Date.now()
-  };
+ return{
+  balance:Math.max(0,Number(old.balance)||0),
+  energy:Math.max(0,Number(old.energy??ENERGY_MAX[energyLevel])),
+  energyLevel,boostLevel,miningLevel,
+  lastDaily:old.lastDaily||"",
+  lastRegen:Number(old.lastRegen)||Date.now()
+ };
 }
 
-let s = loadState();
-s.energy = Math.min(s.energy, ENERGY_MAX[s.energyLevel]);
+let s=loadState();
+s.energy=Math.min(s.energy,ENERGY_MAX[s.energyLevel]);
 
 function save(){
-  localStorage.setItem(KEY, JSON.stringify(s));
+ try{localStorage.setItem(KEY,JSON.stringify(s))}
+ catch(e){console.error("Save failed",e)}
 }
 
-function money(n){
-  return Math.floor(n).toLocaleString("en-US");
+function money(n){return Math.floor(n).toLocaleString("en-US")}
+
+function localDateKey(){
+ const d=new Date();
+ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 
 function render(){
-  document.getElementById("balance").textContent = money(s.balance);
-  document.getElementById("energy").textContent = money(s.energy);
-  document.getElementById("maxEnergy").textContent = money(ENERGY_MAX[s.energyLevel]);
-  document.getElementById("energyFill").style.width =
-    (s.energy / ENERGY_MAX[s.energyLevel] * 100) + "%";
-  document.getElementById("tapReward").textContent = BOOST_REWARDS[s.boostLevel];
-  document.getElementById("regen").textContent = MINING_REGEN[s.miningLevel];
-  document.getElementById("miningLevel").textContent = s.miningLevel;
-  document.getElementById("boostLevel").textContent = s.boostLevel;
+ document.getElementById("balance").textContent=money(s.balance);
+ document.getElementById("energy").textContent=money(s.energy);
+ document.getElementById("maxEnergy").textContent=money(ENERGY_MAX[s.energyLevel]);
+ document.getElementById("energyFill").style.width=
+  (s.energy/ENERGY_MAX[s.energyLevel]*100)+"%";
+ document.getElementById("tapReward").textContent=BOOST_REWARDS[s.boostLevel];
+ document.getElementById("regen").textContent=MINING_REGEN[s.miningLevel];
+ document.getElementById("miningLevel").textContent=s.miningLevel;
+ document.getElementById("boostLevel").textContent=s.boostLevel;
 
-  const bNext = s.boostLevel + 1;
-  document.getElementById("boostTitle").textContent = "Level " + s.boostLevel + (s.boostLevel === 5 ? " (MAX)" : "");
-  document.getElementById("boostInfo").textContent = BOOST_REWARDS[s.boostLevel] + " WOR per tap";
-  document.getElementById("boostCost").textContent = s.boostLevel === 5 ? "Maximum level reached" : "Next upgrade: " + money(BOOST_COSTS[bNext]) + " WOR";
-  document.getElementById("boostButton").textContent = s.boostLevel === 5 ? "MAX" : "UPGRADE";
-  document.getElementById("boostButton").disabled = s.boostLevel === 5 || s.balance < BOOST_COSTS[bNext];
+ const b=s.boostLevel+1;
+ document.getElementById("boostTitle").textContent="Level "+s.boostLevel+(s.boostLevel===5?" (MAX)":"");
+ document.getElementById("boostInfo").textContent=BOOST_REWARDS[s.boostLevel]+" WOR per tap";
+ document.getElementById("boostCost").textContent=s.boostLevel===5?"Maximum level reached":"Next upgrade: "+money(BOOST_COSTS[b])+" WOR";
+ document.getElementById("boostButton").textContent=s.boostLevel===5?"MAX":"UPGRADE";
+ document.getElementById("boostButton").disabled=s.boostLevel===5||s.balance<BOOST_COSTS[b];
 
-  const eNext = s.energyLevel + 1;
-  document.getElementById("energyTitle").textContent = "Level " + s.energyLevel + (s.energyLevel === 5 ? " (MAX)" : "");
-  document.getElementById("energyInfo").textContent = "Maximum " + money(ENERGY_MAX[s.energyLevel]) + " energy";
-  document.getElementById("energyCost").textContent = s.energyLevel === 5 ? "Maximum level reached" : "Next upgrade: " + money(ENERGY_COSTS[eNext]) + " WOR";
-  document.getElementById("energyButton").textContent = s.energyLevel === 5 ? "MAX" : "UPGRADE";
-  document.getElementById("energyButton").disabled = s.energyLevel === 5 || s.balance < ENERGY_COSTS[eNext];
+ const e=s.energyLevel+1;
+ document.getElementById("energyTitle").textContent="Level "+s.energyLevel+(s.energyLevel===5?" (MAX)":"");
+ document.getElementById("energyInfo").textContent="Maximum "+money(ENERGY_MAX[s.energyLevel])+" energy";
+ document.getElementById("energyCost").textContent=s.energyLevel===5?"Maximum level reached":"Next upgrade: "+money(ENERGY_COSTS[e])+" WOR";
+ document.getElementById("energyButton").textContent=s.energyLevel===5?"MAX":"UPGRADE";
+ document.getElementById("energyButton").disabled=s.energyLevel===5||s.balance<ENERGY_COSTS[e];
 
-  const mNext = s.miningLevel + 1;
-  document.getElementById("miningTitle").textContent = "Level " + s.miningLevel + (s.miningLevel === 5 ? " (MAX)" : "");
-  document.getElementById("miningInfo").textContent = MINING_REGEN[s.miningLevel] + " energy per second";
-  document.getElementById("miningCost").textContent = s.miningLevel === 5 ? "Maximum level reached" : "Next upgrade: " + money(MINING_COSTS[mNext]) + " WOR";
-  document.getElementById("miningButton").textContent = s.miningLevel === 5 ? "MAX" : "UPGRADE";
-  document.getElementById("miningButton").disabled = s.miningLevel === 5 || s.balance < MINING_COSTS[mNext];
+ const m=s.miningLevel+1;
+ document.getElementById("miningTitle").textContent="Level "+s.miningLevel+(s.miningLevel===5?" (MAX)":"");
+ document.getElementById("miningInfo").textContent=MINING_REGEN[s.miningLevel]+" energy per second";
+ document.getElementById("miningCost").textContent=s.miningLevel===5?"Maximum level reached":"Next upgrade: "+money(MINING_COSTS[m])+" WOR";
+ document.getElementById("miningButton").textContent=s.miningLevel===5?"MAX":"UPGRADE";
+ document.getElementById("miningButton").disabled=s.miningLevel===5||s.balance<MINING_COSTS[m];
 
-  const today = new Date().toISOString().slice(0,10);
-  document.getElementById("dailyButton").disabled = s.lastDaily === today;
-  document.getElementById("dailyButton").textContent =
-    s.lastDaily === today ? "ALREADY CLAIMED" : "CLAIM +100 WOR";
+ const today=localDateKey();
+ document.getElementById("dailyButton").disabled=s.lastDaily===today;
+ document.getElementById("dailyButton").textContent=s.lastDaily===today?"ALREADY CLAIMED":"CLAIM +100 WOR";
 }
 
-document.getElementById("tapButton").addEventListener("click", () => {
-  const reward = BOOST_REWARDS[s.boostLevel];
-  if (s.energy < reward) {
-    alert("Not enough energy! Wait for recharge.");
-    return;
+function openPage(id){
+ if(!document.getElementById(id))return;
+ document.querySelectorAll("#bottomNav button").forEach(btn=>{
+  const active=btn.dataset.page===id;
+  btn.classList.toggle("active",active);
+  if(active)btn.setAttribute("aria-current","page");
+  else btn.removeAttribute("aria-current");
+ });
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.querySelectorAll("#bottomNav button").forEach(btn=>{
+ btn.addEventListener("click",()=>openPage(btn.dataset.page));
+});
+
+/* Fast multi-tapping: one reward per distinct pointer press.
+   No extra click handler is added, preventing double rewards. */
+const tapButton=document.getElementById("tapButton");
+let tapCount=0;
+let lastTapMessage=0;
+
+tapButton.addEventListener("pointerdown",event=>{
+ if(event.pointerType==="mouse"&&event.button!==0)return;
+ event.preventDefault();
+
+ const reward=BOOST_REWARDS[s.boostLevel];
+ if(s.energy<reward){
+  const now=Date.now();
+  if(now-lastTapMessage>1200){
+   lastTapMessage=now;
+   if(tg?.showAlert)tg.showAlert("Not enough energy! Wait for recharge.");
+   else document.getElementById("tapMessage").textContent="Not enough energy. Wait for recharge.";
   }
-  s.energy -= reward;
-  s.balance += reward;
+  return;
+ }
+
+ s.energy-=reward;
+ s.balance+=reward;
+ tapCount++;
+ document.getElementById("tapMessage").textContent="+"+reward+" WOR · Taps: "+tapCount;
+ save();
+ render();
+},{passive:false});
+
+document.getElementById("boostButton").addEventListener("click",()=>{
+ const n=s.boostLevel+1;
+ if(n>5||s.balance<BOOST_COSTS[n])return;
+ s.balance-=BOOST_COSTS[n];
+ s.boostLevel=n;
+ save();render();
+});
+
+document.getElementById("energyButton").addEventListener("click",()=>{
+ const n=s.energyLevel+1;
+ if(n>5||s.balance<ENERGY_COSTS[n])return;
+ s.balance-=ENERGY_COSTS[n];
+ s.energyLevel=n;
+ s.energy=ENERGY_MAX[n];
+ save();render();
+});
+
+document.getElementById("miningButton").addEventListener("click",()=>{
+ const n=s.miningLevel+1;
+ if(n>5||s.balance<MINING_COSTS[n])return;
+ s.balance-=MINING_COSTS[n];
+ s.miningLevel=n;
+ save();render();
+});
+
+document.getElementById("dailyButton").addEventListener("click",()=>{
+ const today=localDateKey();
+ if(s.lastDaily===today)return;
+ s.balance+=100;
+ s.lastDaily=today;
+ save();render();
+});
+
+document.getElementById("channelButton").addEventListener("click",()=>{
+ const url="https://t.me/owlcoin137";
+ if(tg?.openTelegramLink)tg.openTelegramLink(url);
+ else window.open(url,"_blank");
+});
+
+document.getElementById("inviteButton").addEventListener("click",()=>{
+ const url="https://t.me/WORMiningBot";
+ const share="https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent("Join me on WORCOIN Mining!");
+ if(tg?.openTelegramLink)tg.openTelegramLink(share);
+ else window.open(share,"_blank");
+});
+
+/* Recharge according to Mining Level */
+function recharge(){
+ const now=Date.now();
+ const elapsed=Math.max(0,Math.floor((now-s.lastRegen)/1000));
+ if(elapsed>0){
+  s.energy=Math.min(ENERGY_MAX[s.energyLevel],s.energy+elapsed*MINING_REGEN[s.miningLevel]);
+  s.lastRegen+=elapsed*1000;
   save();
   render();
-});
-
-document.getElementById("boostButton").addEventListener("click", () => {
-  const next = s.boostLevel + 1;
-  if (next > 5 || s.balance < BOOST_COSTS[next]) return;
-  s.balance -= BOOST_COSTS[next];
-  s.boostLevel = next;
-  save(); render();
-});
-
-document.getElementById("energyButton").addEventListener("click", () => {
-  const next = s.energyLevel + 1;
-  if (next > 5 || s.balance < ENERGY_COSTS[next]) return;
-  s.balance -= ENERGY_COSTS[next];
-  s.energyLevel = next;
-  s.energy = ENERGY_MAX[next];
-  save(); render();
-});
-
-document.getElementById("miningButton").addEventListener("click", () => {
-  const next = s.miningLevel + 1;
-  if (next > 5 || s.balance < MINING_COSTS[next]) return;
-  s.balance -= MINING_COSTS[next];
-  s.miningLevel = next;
-  save(); render();
-});
-
-document.getElementById("dailyButton").addEventListener("click", () => {
-  const today = new Date().toISOString().slice(0,10);
-  if (s.lastDaily === today) return;
-  s.balance += 100;
-  s.lastDaily = today;
-  save(); render();
-});
-
-document.getElementById("channelButton").addEventListener("click", () => {
-  const url = "https://t.me/owlcoin137";
-  if (tg?.openTelegramLink) tg.openTelegramLink(url);
-  else window.open(url, "_blank");
-});
-
-document.querySelectorAll("nav button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById(btn.dataset.page).classList.add("active");
-  });
-});
-
-/* Recharge according to current Mining Level */
-function recharge(){
-  const now = Date.now();
-  const elapsed = Math.max(0, Math.floor((now - s.lastRegen) / 1000));
-  if (elapsed > 0) {
-    s.energy = Math.min(
-      ENERGY_MAX[s.energyLevel],
-      s.energy + elapsed * MINING_REGEN[s.miningLevel]
-    );
-    s.lastRegen = now;
-    save();
-    render();
-  }
+ }
 }
 
 save();
 render();
-setInterval(recharge, 1000);
+setInterval(recharge,1000);
 </script>
 </body>
 </html>
