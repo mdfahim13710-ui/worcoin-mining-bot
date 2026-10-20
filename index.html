@@ -1,348 +1,285 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#080b12">
-<title>WORCOIN Mining</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-*{box-sizing:border-box}
-:root{--bg:#080b12;--card:#121824;--gold:#f5c451;--muted:#8b96a9;--green:#57e39b}
-body{margin:0;background:var(--bg);color:#fff;font-family:Arial,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);min-height:100vh}
-button{font:inherit;cursor:pointer}
-.app{max-width:520px;margin:auto;min-height:100vh;padding:18px 16px 100px}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-.logo{font-size:22px;font-weight:900;letter-spacing:1px;color:var(--gold)}
-.pill{background:#192231;border:1px solid #283348;border-radius:20px;padding:8px 12px;font-size:12px;color:#c8d1df}
-.balance-card{background:linear-gradient(135deg,#1a2433,#111722);border:1px solid #293448;border-radius:22px;padding:20px;text-align:center}
-.small{color:var(--muted);font-size:12px;letter-spacing:1px}
-.balance{font-size:36px;font-weight:900;margin:8px 0;color:#fff;overflow-wrap:anywhere}
-.coin-area{display:flex;justify-content:center;align-items:center;padding:25px 0 18px}
-.coin{width:min(76vw,300px);height:min(76vw,300px);border-radius:50%;border:0;position:relative;background:radial-gradient(circle at 35% 25%,#fff1a8 0,#f7cf59 22%,#d99b22 57%,#805012 100%);box-shadow:0 0 0 9px #f6c64a15,0 0 0 17px #f6c64a09,0 14px 38px #0008,inset 0 4px 9px #fff8,inset 0 -10px 18px #603b08;display:flex;align-items:center;justify-content:center;touch-action:manipulation;user-select:none;-webkit-user-select:none}
-.coin:after{content:"";position:absolute;inset:13px;border-radius:50%;border:3px solid #fff5}
-.coin span{font-size:100px;filter:drop-shadow(0 5px 3px #583b16);pointer-events:none}
-.coin:active{transform:scale(.97)}
-.coin-hint{text-align:center;color:var(--muted);font-size:12px;margin-top:-4px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:20px 0}
-.stat{background:var(--card);border:1px solid #222d3d;border-radius:15px;padding:13px 6px;text-align:center}
-.stat strong{display:block;font-size:17px;margin-top:7px}
-.energybar{height:8px;background:#273143;border-radius:10px;overflow:hidden;margin-top:10px}
-.energyfill{height:100%;width:100%;background:linear-gradient(90deg,#57e39b,#b0ffb8);transition:width .2s}
-.panel{background:var(--card);border:1px solid #222d3d;border-radius:18px;padding:16px;margin:15px 0}
-.panel h3{margin:0 0 12px;font-size:16px}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.muted{color:var(--muted);font-size:12px;line-height:1.5}
-.primary,.secondary{border:0;border-radius:12px;padding:12px 14px;font-weight:800}
-.primary{background:var(--gold);color:#17120a}
-.secondary{background:#253247;color:#fff}
-.primary:disabled{opacity:.45}
-.tab{display:none}
-.tab.active{display:block}
-.bottom-nav{position:fixed;z-index:10;bottom:0;left:0;right:0;padding:10px 7px calc(10px + env(safe-area-inset-bottom));background:#0d121cF5;border-top:1px solid #253044;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;max-width:520px;margin:auto}
-.navbtn{border:0;background:transparent;color:#8792a5;border-radius:12px;padding:8px 2px;font-size:10px}
-.navbtn span{display:block;font-size:20px;margin-bottom:5px}
-.navbtn.active{color:var(--gold);background:#f5c45112}
-.item{display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid #263041}
-.item:last-child{border-bottom:0}
-.item-icon{width:42px;height:42px;border-radius:12px;background:#222e40;display:grid;place-items:center;font-size:21px;flex-shrink:0}
-.item-info{flex:1;min-width:0}
-.item-info strong{font-size:13px}
-.item-info p{margin:5px 0 0;color:var(--muted);font-size:11px}
-.item button{white-space:nowrap}
-input{width:100%;padding:12px;border-radius:10px;border:1px solid #344155;background:#0b111b;color:white;margin:8px 0}
-.notice{font-size:11px;color:#9da8b8;line-height:1.6}
-.rank-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #263041;font-size:13px}
-footer{text-align:center;color:#677387;font-size:10px;padding:20px 0}
-</style>
-</head>
-<body>
-<div class="app">
-<header>
-  <div class="logo">🦉 WORCOIN</div>
-  <div class="pill" id="levelPill">LEVEL 1</div>
-</header>
 
-<section id="mine" class="tab active">
-  <div class="balance-card">
-    <div class="small">YOUR WORCOIN BALANCE</div>
-    <div class="balance" id="balance">0 WOR</div>
-    <div class="pill" id="league" style="display:inline-block">🥉 Bronze League</div>
-  </div>
+const tg = window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
 
-  <div class="coin-area">
-    <button class="coin" id="coin" aria-label="Tap to mine WORCOIN">
-      <span>🦉</span>
-    </button>
-  </div>
-  <div class="coin-hint">TAP THE OWL TO MINE WORCOIN</div>
+const KEY = "worcoin_v3";
+const $ = id => document.getElementById(id);
 
-  <div class="stats">
-    <div class="stat"><span class="small">⚡ ENERGY</span><strong id="energy">1000/1000</strong></div>
-    <div class="stat"><span class="small">👆 PER TAP</span><strong id="perTap">1 WOR</strong></div>
-    <div class="stat"><span class="small">⬆️ LEVEL</span><strong id="tapLevel">LV 1</strong></div>
-  </div>
-  <div class="panel">
-    <div class="row"><strong>⚡ Energy recharge</strong><span class="muted" id="regenText">+1/sec</span></div>
-    <div class="energybar"><div class="energyfill" id="energyFill"></div></div>
-  </div>
-  <div class="panel">
-    <div class="row"><div><strong>🎁 Daily Reward</strong><p class="muted">Claim once every day in Tasks</p></div><button class="secondary" onclick="showTab('tasks')">Tasks</button></div>
-  </div>
-</section>
+const BOOST_REWARDS = [0, 1, 2, 6, 12, 20];
+const BOOST_COSTS   = [0, 0, 2000, 6000, 12000, 20000];
+const ENERGY_MAX    = [0, 1000, 2000, 4000, 8000, 16000];
+const ENERGY_COSTS  = [0, 0, 4000, 8000, 16000, 32000];
+const MINING_REGEN  = [0, 1, 2, 3, 8, 16];
+const MINING_COSTS  = [0, 0, 1000, 3000, 8000, 40000];
 
-<section id="tasks" class="tab">
-  <h2>🎁 Tasks</h2>
-  <p class="muted">Complete activities to earn WORCOIN.</p>
-  <div class="panel" id="taskList"></div>
-  <div class="panel">
-    <h3>📢 Join WORCOIN Channel</h3>
-    <p class="muted">Join the official channel, then verify membership to claim the reward. Real membership verification needs a configured backend and bot administrator permissions.</p>
-    <button class="secondary" style="width:100%" onclick="openChannel()">JOIN CHANNEL</button>
-    <p class="notice">The claim button stays disabled until server-side membership verification is configured.</p>
-    <button class="primary" id="joinClaim" disabled style="width:100%">VERIFY & CLAIM 10,000 WOR</button>
-  </div>
-</section>
+let s;
+try {
+  s = JSON.parse(localStorage.getItem(KEY) || "null");
+} catch {
+  s = null;
+}
 
-<section id="friends" class="tab">
-  <h2>👥 Friends</h2>
-  <div class="panel">
-    <h3>Invite friends to WORCOIN</h3>
-    <p class="muted">Share your Telegram bot referral link.</p>
-    <input id="refLink" readonly value="Open this game from your Telegram bot">
-    <button class="primary" style="width:100%" onclick="shareInvite()">SHARE INVITE</button>
-    <p class="notice">Referral rewards require server-side tracking to prevent fake or duplicate referrals.</p>
-  </div>
-</section>
-
-<section id="ranking" class="tab">
-  <h2>🏆 Top 100 Ranking</h2>
-  <div class="panel">
-    <p class="muted">Live public rankings require a shared database/API. This page does not invent other players' balances.</p>
-    <div id="rankList"><div class="rank-row"><span>Connect leaderboard backend</span><span>—</span></div></div>
-  </div>
-</section>
-
-<section id="upgrade" class="tab">
-  <h2>⬆️ Upgrades</h2>
-  <p class="muted">Spend your WORCOIN to improve mining.</p>
-  <div class="panel" id="upgradeList"></div>
-</section>
-
-<footer>WORCOIN • Mining game prototype</footer>
-</div>
-
-<nav class="bottom-nav">
-  <button class="navbtn active" data-tab="mine"><span>⛏️</span>Mine</button>
-  <button class="navbtn" data-tab="tasks"><span>🎁</span>Tasks</button>
-  <button class="navbtn" data-tab="friends"><span>👥</span>Friends</button>
-  <button class="navbtn" data-tab="ranking"><span>🏆</span>Ranking</button>
-  <button class="navbtn" data-tab="upgrade"><span>⬆️</span>Upgrade</button>
-</nav>
-
-<script>
-(() => {
-  "use strict";
-  const tg = window.Telegram?.WebApp;
-  tg?.ready();
-  tg?.expand();
-
-  const BOT_USERNAME = "YOUR_BOT_USERNAME";
-  const CHANNEL_URL = "https://t.me/worcoin";
-  const STORAGE_KEY = "worcoin_game_v1";
-
-  const defaults = {
+if (!s) {
+  s = {
     balance: 0,
     energy: 1000,
-    tapLevel: 1,
-    energyLevel: 1,
+    maxEnergy: 1000,
     miningLevel: 1,
-    lastEnergy: Date.now(),
-    dailyDate: "",
-    claimedTasks: [],
-    dailyClaimed: false
+    boostLevel: 1,
+    energyLevel: 1,
+    lastDaily: ""
   };
+}
 
-  let data;
-  try {
-    data = {...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")};
-  } catch {
-    data = {...defaults};
-  }
+s.balance = Math.max(0, Number(s.balance) || 0);
+s.boostLevel = Math.max(1, Math.min(5, Math.floor(Number(s.boostLevel) || 1)));
+s.miningLevel = Math.max(1, Math.min(5, Math.floor(Number(s.miningLevel) || 1)));
 
-  const $ = id => document.getElementById(id);
-  const number = n => Math.floor(n).toLocaleString("en-US");
-  const maxEnergy = () => 1000 + (data.energyLevel - 1) * 500;
-  const tapReward = () => data.tapLevel;
-  const regenPerSecond = () => data.miningLevel;
-  const today = () => new Date().toISOString().slice(0, 10);
+if (!s.energyLevel) {
+  const oldMax = Number(s.maxEnergy) || 1000;
+  s.energyLevel = oldMax >= 16000 ? 5 :
+                  oldMax >= 8000 ? 4 :
+                  oldMax >= 4000 ? 3 :
+                  oldMax >= 2000 ? 2 : 1;
+}
 
-  function save() {
-    data.lastEnergy = Date.now();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  }
+s.energyLevel = Math.max(1, Math.min(5, Math.floor(Number(s.energyLevel) || 1)));
+s.maxEnergy = ENERGY_MAX[s.energyLevel];
+s.energy = Math.max(0, Math.min(s.maxEnergy, Number(s.energy) || 0));
+s.lastDaily = s.lastDaily || "";
 
-  function refreshEnergy() {
-    const now = Date.now();
-    const elapsed = Math.max(0, (now - (data.lastEnergy || now)) / 1000);
-    data.energy = Math.min(maxEnergy(), data.energy + elapsed * regenPerSecond());
-    data.lastEnergy = now;
-  }
+function power() {
+  return BOOST_REWARDS[s.boostLevel];
+}
 
-  function leagueName() {
-    if (data.balance >= 1000000) return "💎 Diamond League";
-    if (data.balance >= 100000) return "🥇 Gold League";
-    if (data.balance >= 10000) return "🥈 Silver League";
-    return "🥉 Bronze League";
-  }
+function regenRate() {
+  return MINING_REGEN[s.miningLevel];
+}
 
-  function render() {
-    refreshEnergy();
-    $("balance").textContent = number(data.balance) + " WOR";
-    $("energy").textContent = number(data.energy) + "/" + number(maxEnergy());
-    $("energyFill").style.width = (data.energy / maxEnergy() * 100) + "%";
-    $("perTap").textContent = number(tapReward()) + " WOR";
-    $("tapLevel").textContent = "LV " + data.tapLevel;
-    $("levelPill").textContent = "LEVEL " + data.tapLevel;
-    $("league").textContent = leagueName();
-    $("regenText").textContent = "+" + regenPerSecond() + "/sec";
-    save();
-    renderTasks();
-    renderUpgrades();
-  }
+function costs() {
+  return {
+    boost: s.boostLevel < 5 ? BOOST_COSTS[s.boostLevel + 1] : 0,
+    mining: s.miningLevel < 5 ? MINING_COSTS[s.miningLevel + 1] : 0,
+    energy: s.energyLevel < 5 ? ENERGY_COSTS[s.energyLevel + 1] : 0
+  };
+}
 
-  $("coin").addEventListener("pointerdown", event => {
-    event.preventDefault();
-    refreshEnergy();
-    if (data.energy < 1) {
-      tg?.HapticFeedback?.notificationOccurred("warning");
-      return;
-    }
-    data.energy = Math.max(0, data.energy - 1);
-    data.balance += tapReward();
-    tg?.HapticFeedback?.impactOccurred("light");
-    render();
-  });
-
-  function showTab(name) {
-    document.querySelectorAll(".tab").forEach(el => el.classList.toggle("active", el.id === name));
-    document.querySelectorAll(".navbtn").forEach(el => el.classList.toggle("active", el.dataset.tab === name));
-    window.scrollTo({top: 0, behavior: "smooth"});
-  }
-  window.showTab = showTab;
-  document.querySelectorAll(".navbtn").forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)));
-
-  function renderTasks() {
-    const tasks = [
-      {id:"daily", icon:"🎁", title:"Daily Reward", desc:"Claim once per day", reward:100},
-      {id:"welcome", icon:"🦉", title:"Welcome Task", desc:"Welcome to WORCOIN", reward:100},
-      {id:"explore", icon:"🔎", title:"Explore WORCOIN", desc:"Explore the mining app", reward:50}
-    ];
-    $("taskList").innerHTML = "";
-    tasks.forEach(task => {
-      const claimed = task.id === "daily"
-        ? data.dailyDate === today()
-        : data.claimedTasks.includes(task.id);
-      const row = document.createElement("div");
-      row.className = "item";
-      row.innerHTML = `
-        <div class="item-icon">${task.icon}</div>
-        <div class="item-info"><strong>${task.title}</strong><p>${task.desc} • +${task.reward} WOR</p></div>
-        <button class="${claimed ? "secondary" : "primary"}" ${claimed ? "disabled" : ""}>${claimed ? "CLAIMED" : "CLAIM"}</button>`;
-      row.querySelector("button").addEventListener("click", () => {
-        if (task.id === "daily") {
-          if (data.dailyDate === today()) return;
-          data.dailyDate = today();
-        } else {
-          if (data.claimedTasks.includes(task.id)) return;
-          data.claimedTasks.push(task.id);
-        }
-        data.balance += task.reward;
-        save();
-        render();
-      });
-      $("taskList").appendChild(row);
-    });
-  }
-
-  const upgradeDefs = [
-    {key:"tapLevel", title:"👆 Tap Boost", desc:"WORCOIN earned per tap", baseCost:500, max:10},
-    {key:"energyLevel", title:"⚡ Energy Capacity", desc:"Maximum energy +500 per level", baseCost:300, max:10},
-    {key:"miningLevel", title:"⛏️ Mining Speed", desc:"Energy recharge +1/sec per level", baseCost:400, max:10}
-  ];
-
-  function upgradeCost(def) {
-    return Math.floor(def.baseCost * Math.pow(2, data[def.key] - 1));
-  }
-
-  function benefit(def) {
-    if (def.key === "tapLevel") return data.tapLevel + " WOR per tap";
-    if (def.key === "energyLevel") return number(maxEnergy()) + " energy capacity";
-    return "+" + regenPerSecond() + " energy/sec";
-  }
-
-  function renderUpgrades() {
-    $("upgradeList").innerHTML = "";
-    upgradeDefs.forEach(def => {
-      const level = data[def.key];
-      const maxed = level >= def.max;
-      const cost = upgradeCost(def);
-      const row = document.createElement("div");
-      row.className = "item";
-      row.innerHTML = `
-        <div class="item-icon">${def.title.split(" ")[0]}</div>
-        <div class="item-info">
-          <strong>${def.title}</strong>
-          <p>Level ${level}/${def.max} • ${benefit(def)}</p>
-          <p>${def.desc}</p>
-          <p>${maxed ? "MAX LEVEL" : "Next cost: " + number(cost) + " WOR"}</p>
-        </div>
-        <button class="${maxed ? "secondary" : "primary"}" ${maxed || data.balance < cost ? "disabled" : ""}>${maxed ? "MAX" : "UPGRADE"}</button>`;
-      row.querySelector("button").addEventListener("click", () => {
-        if (maxed || data.balance < cost) return;
-        data.balance -= cost;
-        data[def.key]++;
-        render();
-      });
-      $("upgradeList").appendChild(row);
-    });
-  }
-
-  function openChannel() {
-    if (tg?.openTelegramLink) tg.openTelegramLink(CHANNEL_URL);
-    else window.open(CHANNEL_URL, "_blank", "noopener");
-  }
-  window.openChannel = openChannel;
-
-  function shareInvite() {
-    const user = tg?.initDataUnsafe?.user;
-    const link = BOT_USERNAME !== "YOUR_BOT_USERNAME"
-      ? "https://t.me/" + BOT_USERNAME + "?start=" + (user?.id || "")
-      : "";
-    if (!link) {
-      alert("Set BOT_USERNAME in index.html to your real Telegram bot username first.");
-      return;
-    }
-    const text = "Join me on WORCOIN!";
-    if (tg?.openTelegramLink) {
-      tg.openTelegramLink("https://t.me/share/url?url=" + encodeURIComponent(link) + "&text=" + encodeURIComponent(text));
-    } else {
-      window.open("https://t.me/share/url?url=" + encodeURIComponent(link) + "&text=" + encodeURIComponent(text), "_blank", "noopener");
-    }
-  }
-  window.shareInvite = shareInvite;
-
-  const user = tg?.initDataUnsafe?.user;
-  if (user) {
-    $("refLink").value = BOT_USERNAME !== "YOUR_BOT_USERNAME"
-      ? "https://t.me/" + BOT_USERNAME + "?start=" + user.id
-      : "Set your bot username in the HTML first";
-  }
-
+function save() {
+  localStorage.setItem(KEY, JSON.stringify(s));
   render();
-  setInterval(render, 1000);
-})();
-</script>
-</body>
-</html>
+}
+
+function render() {
+  $("topBalance").textContent = Math.floor(s.balance).toLocaleString() + " WOR";
+  $("energyText").textContent = Math.floor(s.energy) + " / " + s.maxEnergy;
+  $("energyBar").style.width =
+    Math.max(0, Math.min(100, s.energy / s.maxEnergy * 100)) + "%";
+
+  $("tapPower").textContent = power();
+  $("levelText").textContent = s.miningLevel;
+  $("boostText").textContent = s.boostLevel;
+  $("boostLevel").textContent = s.boostLevel;
+  $("miningLevel").textContent = s.miningLevel;
+  $("energyMax").textContent = s.maxEnergy;
+
+  const c = costs();
+
+  $("boostCost").textContent = s.boostLevel >= 5 ? "MAX" : c.boost.toLocaleString();
+  $("miningCost").textContent = s.miningLevel >= 5 ? "MAX" : c.mining.toLocaleString();
+  $("energyCost").textContent = s.energyLevel >= 5 ? "MAX" : c.energy.toLocaleString();
+
+  $("boostBtn").textContent = s.boostLevel >= 5 ? "MAX" : "Upgrade";
+  $("miningBtn").textContent = s.miningLevel >= 5 ? "MAX" : "Upgrade";
+  $("energyBtn").textContent = s.energyLevel >= 5 ? "MAX" : "Upgrade";
+
+  $("boostBtn").disabled = s.boostLevel >= 5 || s.balance < c.boost;
+  $("miningBtn").disabled = s.miningLevel >= 5 || s.balance < c.mining;
+  $("energyBtn").disabled = s.energyLevel >= 5 || s.balance < c.energy;
+
+  const claimed = s.lastDaily === new Date().toDateString();
+  $("dailyBtn").textContent = claimed ? "Claimed" : "Claim";
+  $("dailyBtn").disabled = claimed;
+}
+
+function showPage(id) {
+  document.querySelectorAll(".screen").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll("#mainNav button").forEach(el => el.classList.remove("active"));
+  $(id).classList.add("active");
+
+  const nav = document.querySelector('#mainNav button[data-page="' + id + '"]');
+  if (nav) nav.classList.add("active");
+  tg?.HapticFeedback?.impactOccurred("light");
+}
+
+document.querySelectorAll("#mainNav button").forEach(btn => {
+  btn.onclick = () => showPage(btn.dataset.page);
+});
+
+// Boost level controls coins per tap.
+// Every tap spends the same amount of energy as coins earned.
+$("tapCircle").addEventListener("pointerdown", e => {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  e.preventDefault();
+
+  const reward = power();
+  if (s.energy < reward) return;
+
+  s.balance += reward;
+  s.energy -= reward;
+
+  const rect = $("tapCircle").getBoundingClientRect();
+  const float = document.createElement("span");
+  float.className = "floatCoin";
+  float.textContent = "+" + reward + " WOR";
+  float.style.left = (e.clientX - rect.left - 25) + "px";
+  float.style.top = (e.clientY - rect.top - 10) + "px";
+  $("tapCircle").appendChild(float);
+  setTimeout(() => float.remove(), 750);
+
+  tg?.HapticFeedback?.impactOccurred("light");
+  save();
+});
+
+// Mining level controls energy regeneration per second.
+setInterval(() => {
+  if (s.energy < s.maxEnergy) {
+    s.energy = Math.min(s.maxEnergy, s.energy + regenRate());
+    save();
+  }
+}, 1000);
+
+function upgrade(type) {
+  const c = costs()[type];
+  if (!c || s.balance < c) return;
+
+  s.balance -= c;
+
+  if (type === "boost" && s.boostLevel < 5) {
+    s.boostLevel++;
+  } else if (type === "mining" && s.miningLevel < 5) {
+    s.miningLevel++;
+  } else if (type === "energy" && s.energyLevel < 5) {
+    s.energyLevel++;
+    s.maxEnergy = ENERGY_MAX[s.energyLevel];
+    s.energy = s.maxEnergy;
+  }
+
+  save();
+  tg?.HapticFeedback?.notificationOccurred("success");
+}
+
+$("boostBtn").onclick = () => upgrade("boost");
+$("miningBtn").onclick = () => upgrade("mining");
+$("energyBtn").onclick = () => upgrade("energy");
+
+const uid = tg?.initDataUnsafe?.user?.id || "demo";
+$("inviteLink").textContent = "https://t.me/WORMiningBot?start=ref_" + uid;
+
+$("shareBtn").onclick = async () => {
+  const link = $("inviteLink").textContent;
+  const shareUrl = "https://t.me/share/url?url=" +
+    encodeURIComponent(link) + "&text=" + encodeURIComponent("Join WORCOIN");
+
+  if (tg?.openTelegramLink) {
+    tg.openTelegramLink(shareUrl);
+  } else if (navigator.share) {
+    try {
+      await navigator.share({ title: "WORCOIN", text: "Join WORCOIN", url: link });
+    } catch {}
+  } else {
+    try {
+      await navigator.clipboard.writeText(link);
+      alert("Invite link copied");
+    } catch {
+      alert(link);
+    }
+  }
+};
+
+$("channelBtn").onclick = () => {
+  const link = "https://t.me/owlcoin137";
+  if (tg?.openTelegramLink) tg.openTelegramLink(link);
+  else window.open(link, "_blank");
+};
+
+$("dailyBtn").onclick = () => {
+  if (s.lastDaily === new Date().toDateString()) return;
+  s.balance += 100;
+  s.lastDaily = new Date().toDateString();
+  save();
+};
+
+// Local-only logo settings; not secure admin authentication.
+let logoTaps = 0;
+let logoTapTimer;
+
+$("brandTitle").addEventListener("click", () => {
+  logoTaps++;
+  clearTimeout(logoTapTimer);
+  logoTapTimer = setTimeout(() => logoTaps = 0, 1800);
+  if (logoTaps >= 5) {
+    logoTaps = 0;
+    showPage("admin");
+  }
+});
+
+$("backHome").onclick = () => showPage("home");
+
+const LOGO_KEY = "worcoin_custom_logo";
+
+function applyLogo(data) {
+  const face = $("coinFace");
+  if (data) {
+    face.innerHTML = "";
+    const img = document.createElement("img");
+    img.id = "coinLogoImg";
+    img.alt = "WORCOIN logo";
+    img.src = data;
+    face.appendChild(img);
+  } else {
+    face.innerHTML = '<div class="coinA">A</div><div class="coinName">WORCOIN</div>';
+  }
+}
+
+try {
+  applyLogo(localStorage.getItem(LOGO_KEY));
+} catch {
+  applyLogo(null);
+}
+
+$("logoFile").addEventListener("change", e => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (file.size > 1500000) {
+    alert("Please choose an image under 1.5 MB.");
+    e.target.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      localStorage.setItem(LOGO_KEY, reader.result);
+      applyLogo(reader.result);
+      alert("Logo preview updated on this device.");
+    } catch {
+      alert("Image is too large to save on this device.");
+    }
+  };
+  reader.readAsDataURL(file);
+});
+
+$("resetLogo").onclick = () => {
+  localStorage.removeItem(LOGO_KEY);
+  applyLogo(null);
+  $("logoFile").value = "";
+};
+
+// Update the Mining description to reflect its new purpose.
+const miningCard = $("miningBtn").closest(".upgrade");
+miningCard.querySelector("p").textContent = "Increase energy regeneration speed.";
+
+save();
