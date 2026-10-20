@@ -3,23 +3,18 @@ import json
 import hmac
 import hashlib
 import time
-import logging
 from urllib.parse import parse_qsl
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
+import logging
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 
-# =========================
-# CONFIG
-# =========================
-
 TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN") or os.environ.get("BOT_TOKEN")
-
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
 SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 
@@ -31,13 +26,13 @@ GAME_URL = (
 
 PORT = int(os.environ.get("PORT", "10000"))
 
+# Required Telegram channel for Join & Claim
 CHANNEL_USERNAME = "@owlcoin137"
-
-DAILY_REWARD = 100
 CHANNEL_REWARD = 500
+DAILY_REWARD = 100
 
-MAX_TAP_BATCH = 20
 INITDATA_MAX_AGE = 86400
+MAX_TAP_BATCH = 20
 
 MAX_LEVEL = 5
 
@@ -65,27 +60,6 @@ MINING_SPEED = {
     5: 5,
 }
 
-BOOST_COST = {
-    1: 2000,
-    2: 6000,
-    3: 12000,
-    4: 20000,
-}
-
-ENERGY_COST = {
-    1: 4000,
-    2: 8000,
-    3: 16000,
-    4: 32000,
-}
-
-MINING_COST = {
-    1: 3000,
-    2: 6000,
-    3: 12000,
-    4: 24000,
-}
-
 
 logging.basicConfig(
     level=os.environ.get("LOG_LEVEL", "INFO"),
@@ -95,9 +69,9 @@ logging.basicConfig(
 log = logging.getLogger("worcoin")
 
 
-# =========================
+# ---------------------------------------------------------
 # SUPABASE
-# =========================
+# ---------------------------------------------------------
 
 def sb(method, path, body=None, query=""):
     if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
@@ -118,10 +92,7 @@ def sb(method, path, body=None, query=""):
     if method.upper() in ("POST", "PATCH", "PUT"):
         headers["Prefer"] = "return=representation"
 
-    data = None
-
-    if body is not None:
-        data = json.dumps(body).encode("utf-8")
+    data = json.dumps(body).encode() if body is not None else None
 
     req = Request(
         url,
@@ -132,19 +103,15 @@ def sb(method, path, body=None, query=""):
 
     try:
         with urlopen(req, timeout=15) as response:
-            raw = response.read().decode("utf-8")
+            raw = response.read().decode()
             return json.loads(raw) if raw else []
 
     except HTTPError as e:
         detail = e.read().decode(errors="replace")
-        raise RuntimeError(
-            f"Supabase HTTP {e.code}: {detail}"
-        )
+        raise RuntimeError(f"Supabase HTTP {e.code}: {detail}")
 
     except URLError as e:
-        raise RuntimeError(
-            f"Supabase connection error: {e}"
-        )
+        raise RuntimeError(f"Supabase connection error: {e}")
 
 
 def rpc(name, args):
@@ -163,9 +130,9 @@ def rpc(name, args):
     return {}
 
 
-# =========================
-# TELEGRAM INIT DATA
-# =========================
+# ---------------------------------------------------------
+# TELEGRAM WEB APP SECURITY
+# ---------------------------------------------------------
 
 def validate_init_data(init_data):
     if not init_data or not TOKEN:
@@ -230,23 +197,29 @@ def validate_init_data(init_data):
         return None
 
 
-# =========================
+# ---------------------------------------------------------
 # PROFILE
-# =========================
+# ---------------------------------------------------------
 
 def get_profile(uid):
-    """
-    IMPORTANT:
-    select=* ব্যবহার করা হয়েছে।
-    তাই refer_count-এর মতো কোনো optional
-    column না থাকলেও profile load বন্ধ হবে না।
-    """
-
     rows = sb(
         "GET",
         "/rest/v1/worcoin_profiles",
         query=(
-            f"telegram_id=eq.{int(uid)}"
+            "select="
+            "telegram_id,"
+            "username,"
+            "firstname,"
+            "balance,"
+            "mininglevel,"
+            "boost_level,"
+            "refer_count,"
+            "energy,"
+            "energy_level,"
+            "last_regen_at,"
+            "last_daily_at,"
+            "channel_claimed"
+            f"&telegram_id=eq.{int(uid)}"
             "&limit=1"
         ),
     )
@@ -260,21 +233,21 @@ def get_legacy_balance(uid):
             "GET",
             "/rest/v1/profiles",
             query=(
-                "select=telegram_id,balance"
+                "select=telegram_id,balance,username"
                 f"&telegram_id=eq.{int(uid)}"
                 "&limit=1"
             ),
         )
 
         if not rows:
-            return 0
+            return None
 
         return int(
             rows[0].get("balance") or 0
         )
 
     except Exception:
-        return 0
+        return None
 
 
 def ensure_profile(user):
@@ -283,45 +256,39 @@ def ensure_profile(user):
     profile = get_profile(uid)
 
     if profile:
-        current_balance = int(
-            profile.get("balance") or 0
-        )
+        # Preserve old balance if available.
+        if int(profile.get("balance") or 0) == 0:
 
-        if current_balance <= 0:
             legacy = get_legacy_balance(uid)
 
-            if legacy > 0:
-                try:
-                    rows = sb(
-                        "PATCH",
-                        "/rest/v1/worcoin_profiles",
-                        body={
-                            "balance": legacy
-                        },
-                        query=(
-                            f"telegram_id=eq.{uid}"
-                        ),
-                    )
+            if legacy and legacy > 0:
 
-                    if rows:
-                        profile = rows[0]
+                rows = sb(
+                    "PATCH",
+                    "/rest/v1/worcoin_profiles",
+                    body={
+                        "balance": legacy
+                    },
+                    query=f"telegram_id=eq.{uid}",
+                )
 
-                except Exception:
-                    log.exception(
-                        "Legacy balance recovery failed"
-                    )
+                if rows:
+                    profile = rows[0]
+                else:
+                    profile["balance"] = legacy
 
         return profile
 
-    legacy = get_legacy_balance(uid)
+    legacy = get_legacy_balance(uid) or 0
 
-    new_profile = {
+    body = {
         "telegram_id": uid,
         "username": user.get("username") or "",
         "firstname": user.get("first_name") or "",
         "balance": legacy,
         "mininglevel": 1,
         "boost_level": 1,
+        "refer_count": 0,
         "energy": 1000,
         "energy_level": 1,
     }
@@ -329,13 +296,10 @@ def ensure_profile(user):
     rows = sb(
         "POST",
         "/rest/v1/worcoin_profiles",
-        body=new_profile,
+        body=body,
     )
 
-    if rows:
-        return rows[0]
-
-    return new_profile
+    return rows[0] if rows else body
 
 
 def public_profile(profile):
@@ -359,13 +323,13 @@ def public_profile(profile):
             profile.get("telegram_id") or 0
         ),
 
-        "username": profile.get(
-            "username"
-        ) or "",
+        "username": (
+            profile.get("username") or ""
+        ),
 
-        "firstname": profile.get(
-            "firstname"
-        ) or "",
+        "firstname": (
+            profile.get("firstname") or ""
+        ),
 
         "balance": int(
             profile.get("balance") or 0
@@ -381,9 +345,9 @@ def public_profile(profile):
 
         "energy_level": energy_level,
 
-        # refer_count বাদ দেওয়া হয়েছে।
-        # database-এ column না থাকলেও আর error হবে না।
-        "refer_count": 0,
+        "refer_count": int(
+            profile.get("refer_count") or 0
+        ),
 
         "channel_claimed": bool(
             profile.get("channel_claimed") or False
@@ -395,36 +359,45 @@ def public_profile(profile):
 
         "tap_reward": TAP_REWARD.get(
             boost_level,
-            boost_level,
+            boost_level
         ),
 
         "energy_capacity": ENERGY_CAPACITY.get(
             energy_level,
-            1000,
+            1000
         ),
 
         "mining_speed": MINING_SPEED.get(
             mining_level,
-            mining_level,
-        ),
-
-        "next_boost_cost": BOOST_COST.get(
-            boost_level
-        ),
-
-        "next_energy_cost": ENERGY_COST.get(
-            energy_level
-        ),
-
-        "next_mining_cost": MINING_COST.get(
             mining_level
         ),
+
+        "next_boost_cost": {
+            1: 2000,
+            2: 6000,
+            3: 12000,
+            4: 20000,
+        }.get(boost_level),
+
+        "next_energy_cost": {
+            1: 4000,
+            2: 8000,
+            3: 16000,
+            4: 32000,
+        }.get(energy_level),
+
+        "next_mining_cost": {
+            1: 3000,
+            2: 6000,
+            3: 12000,
+            4: 24000,
+        }.get(mining_level),
     }
 
 
-# =========================
+# ---------------------------------------------------------
 # TELEGRAM API
-# =========================
+# ---------------------------------------------------------
 
 def telegram_call(method, payload):
     if not TOKEN:
@@ -439,19 +412,16 @@ def telegram_call(method, payload):
 
     req = Request(
         url,
-        data=json.dumps(payload).encode(
-            "utf-8"
-        ),
+        data=json.dumps(payload).encode(),
         headers={
-            "Content-Type":
-                "application/json"
+            "Content-Type": "application/json"
         },
         method="POST",
     )
 
     with urlopen(req, timeout=12) as response:
         result = json.loads(
-            response.read().decode("utf-8")
+            response.read().decode()
         )
 
     if not result.get("ok"):
@@ -466,15 +436,14 @@ def telegram_call(method, payload):
 
 
 def verify_channel_member(uid):
+
     try:
+
         member = telegram_call(
             "getChatMember",
             {
-                "chat_id":
-                    CHANNEL_USERNAME,
-
-                "user_id":
-                    int(uid),
+                "chat_id": CHANNEL_USERNAME,
+                "user_id": int(uid),
             },
         )
 
@@ -495,29 +464,33 @@ def verify_channel_member(uid):
 
         return (
             False,
-            "Join the WORCOIN channel first.",
+            "Join the channel first.",
         )
 
     except Exception:
+
         log.exception(
-            "Channel verification failed"
+            "Channel membership verification failed"
         )
 
         return (
             False,
-            "Membership verification failed. Make sure the bot is admin in the channel.",
+            "Membership verification failed. "
+            "Make sure the bot can check channel members.",
         )
 
 
-# =========================
+# ---------------------------------------------------------
 # GAME ACTIONS
-# =========================
+# ---------------------------------------------------------
 
 def attach_profile(uid, result):
+
     if (
         isinstance(result, dict)
         and result.get("success")
     ):
+
         profile = get_profile(uid)
 
         if profile:
@@ -529,43 +502,44 @@ def attach_profile(uid, result):
 
 
 def do_tap(uid, count):
+
+    try:
+        count = int(count or 1)
+    except Exception:
+        count = 1
+
     count = max(
         1,
-        min(
-            int(count or 1),
-            MAX_TAP_BATCH,
-        ),
-    )
-
-    result = rpc(
-        "worcoin_tap",
-        {
-            "p_telegram_id": int(uid),
-            "p_count": count,
-        },
+        min(count, MAX_TAP_BATCH),
     )
 
     return attach_profile(
         uid,
-        result,
+        rpc(
+            "worcoin_tap",
+            {
+                "p_telegram_id": int(uid),
+                "p_count": count,
+            },
+        ),
     )
 
 
 def do_daily(uid):
-    result = rpc(
-        "worcoin_daily",
-        {
-            "p_telegram_id": int(uid),
-        },
-    )
 
     return attach_profile(
         uid,
-        result,
+        rpc(
+            "worcoin_daily",
+            {
+                "p_telegram_id": int(uid)
+            },
+        ),
     )
 
 
 def do_upgrade(uid, upgrade_type):
+
     if upgrade_type not in (
         "energy",
         "mining",
@@ -573,25 +547,23 @@ def do_upgrade(uid, upgrade_type):
     ):
         return {
             "success": False,
-            "message":
-                "Invalid upgrade type.",
+            "message": "Invalid upgrade type.",
         }
-
-    result = rpc(
-        "worcoin_upgrade",
-        {
-            "p_telegram_id": int(uid),
-            "p_type": upgrade_type,
-        },
-    )
 
     return attach_profile(
         uid,
-        result,
+        rpc(
+            "worcoin_upgrade",
+            {
+                "p_telegram_id": int(uid),
+                "p_type": upgrade_type,
+            },
+        ),
     )
 
 
 def do_channel_claim(uid):
+
     verified, message = verify_channel_member(
         uid
     )
@@ -602,50 +574,52 @@ def do_channel_claim(uid):
             "message": message,
         }
 
-    result = rpc(
-        "worcoin_channel_claim",
-        {
-            "p_telegram_id": int(uid),
-            "p_reward": CHANNEL_REWARD,
-        },
-    )
-
     return attach_profile(
         uid,
-        result,
+        rpc(
+            "worcoin_channel_claim",
+            {
+                "p_telegram_id": int(uid),
+                "p_reward": CHANNEL_REWARD,
+            },
+        ),
     )
 
 
 def get_tasks():
+
     rows = sb(
         "GET",
         "/rest/v1/tasks",
         query=(
-            "select=id,title,description,reward,task_url,is_active"
+            "select="
+            "id,"
+            "title,"
+            "description,"
+            "reward,"
+            "task_url,"
+            "is_active"
             "&is_active=eq.true"
             "&order=id"
         ),
     )
 
-    return (
-        rows
-        if isinstance(rows, list)
-        else []
-    )
+    return rows if isinstance(
+        rows,
+        list
+    ) else []
 
 
-# =========================
-# HTTP SERVER
-# =========================
+# ---------------------------------------------------------
+# HTTP API
+# ---------------------------------------------------------
 
 class APIHandler(BaseHTTPRequestHandler):
 
-    server_version = "WORCOIN/2.0"
-
-    def log_message(self, format, *args):
-        return
+    server_version = "WORCOIN/1.0"
 
     def cors(self):
+
         self.send_header(
             "Access-Control-Allow-Origin",
             "*",
@@ -661,11 +635,16 @@ class APIHandler(BaseHTTPRequestHandler):
             "GET, POST, OPTIONS",
         )
 
-    def json_response(self, status, data):
+    def json_response(
+        self,
+        status,
+        payload,
+    ):
+
         raw = json.dumps(
-            data,
+            payload,
             ensure_ascii=False,
-        ).encode("utf-8")
+        ).encode()
 
         self.send_response(status)
 
@@ -691,7 +670,9 @@ class APIHandler(BaseHTTPRequestHandler):
         self.wfile.write(raw)
 
     def read_json(self):
+
         try:
+
             length = int(
                 self.headers.get(
                     "Content-Length",
@@ -703,15 +684,14 @@ class APIHandler(BaseHTTPRequestHandler):
                 return {}
 
             return json.loads(
-                self.rfile.read(length).decode(
-                    "utf-8"
-                )
+                self.rfile.read(length).decode()
             )
 
         except Exception:
             return {}
 
     def current_user(self):
+
         return validate_init_data(
             self.headers.get(
                 "X-Telegram-Init-Data",
@@ -720,21 +700,71 @@ class APIHandler(BaseHTTPRequestHandler):
         )
 
     def do_OPTIONS(self):
+
         self.send_response(204)
+
         self.cors()
+
         self.end_headers()
 
     def do_GET(self):
 
         path = self.path.split(
             "?",
-            1,
+            1
         )[0]
 
-        # =====================
-        # FRONTEND
-        # =====================
+        # Tap logo
+        if path == "/wor-tap-logo.png":
 
+            image_path = os.path.join(
+                os.path.dirname(
+                    os.path.abspath(__file__)
+                ),
+                "wor-tap-logo.png",
+            )
+
+            if not os.path.exists(
+                image_path
+            ):
+                return self.json_response(
+                    404,
+                    {
+                        "success": False,
+                        "error": "Tap logo not found",
+                    },
+                )
+
+            with open(
+                image_path,
+                "rb",
+            ) as f:
+                raw = f.read()
+
+            self.send_response(200)
+
+            self.send_header(
+                "Content-Type",
+                "image/png",
+            )
+
+            self.send_header(
+                "Content-Length",
+                str(len(raw)),
+            )
+
+            self.send_header(
+                "Cache-Control",
+                "no-store",
+            )
+
+            self.end_headers()
+
+            self.wfile.write(raw)
+
+            return
+
+        # Frontend
         if path in (
             "/",
             "/index.html",
@@ -747,19 +777,8 @@ class APIHandler(BaseHTTPRequestHandler):
                 "index.html",
             )
 
-            if not os.path.exists(
-                index_path
-            ):
-                return self.json_response(
-                    404,
-                    {
-                        "success": False,
-                        "error":
-                            "index.html not found",
-                    },
-                )
+            if os.path.exists(index_path):
 
-            try:
                 with open(
                     index_path,
                     "rb",
@@ -783,15 +802,71 @@ class APIHandler(BaseHTTPRequestHandler):
                     "no-store",
                 )
 
+                self.cors()
+
                 self.end_headers()
 
                 self.wfile.write(raw)
 
                 return
 
+            return self.json_response(
+                200,
+                {
+                    "ok": True,
+                    "service": "WORCOIN API",
+                    "version": "1.2",
+                },
+            )
+
+        # Health check
+        if path == "/api/health":
+
+            return self.json_response(
+                200,
+                {
+                    "success": True,
+                    "service": "WORCOIN",
+                    "version": "1.2",
+                },
+            )
+
+        # Profile
+        if path == "/api/profile":
+
+            user = self.current_user()
+
+            if not user:
+                return self.json_response(
+                    401,
+                    {
+                        "success": False,
+                        "error": (
+                            "Invalid or expired Telegram session."
+                        ),
+                    },
+                )
+
+            try:
+
+                profile = ensure_profile(
+                    user
+                )
+
+                return self.json_response(
+                    200,
+                    {
+                        "success": True,
+                        "profile": public_profile(
+                            profile
+                        ),
+                    },
+                )
+
             except Exception as e:
+
                 log.exception(
-                    "Frontend error"
+                    "profile"
                 )
 
                 return self.json_response(
@@ -802,41 +877,151 @@ class APIHandler(BaseHTTPRequestHandler):
                     },
                 )
 
-        # =====================
-        # HEALTH
-        # =====================
+        # Tasks
+        if path == "/api/tasks":
 
-        if path == "/api/health":
-            return self.json_response(
-                200,
-                {
-                    "success": True,
-                    "service":
-                        "WORCOIN",
-                    "version":
-                        "2.0",
-                },
-            )
+            try:
 
-        # =====================
-        # PROFILE
-        # =====================
-
-        if path == "/api/profile":
-
-            user = self.current_user()
-
-            if not user:
                 return self.json_response(
-                    401,
+                    200,
                     {
-                        "success": False,
-                        "error":
-                            "Invalid or expired Telegram session.",
+                        "success": True,
+                        "tasks": get_tasks(),
                     },
                 )
 
+            except Exception as e:
+
+                log.exception(
+                    "tasks"
+                )
+
+                return self.json_response(
+                    500,
+                    {
+                        "success": False,
+                        "error": str(e),
+                    },
+                )
+
+        # Rank
+        if path == "/api/rank":
+
             try:
+
+                rows = sb(
+                    "GET",
+                    "/rest/v1/worcoin_profiles",
+                    query=(
+                        "select="
+                        "username,"
+                        "firstname,"
+                        "balance,"
+                        "mininglevel,"
+                        "boost_level"
+                        "&order=balance.desc"
+                        "&limit=100"
+                    ),
+                )
+
+                ranking = []
+
+                for position, row in enumerate(
+                    rows or [],
+                    1,
+                ):
+
+                    ranking.append(
+                        {
+                            "rank": position,
+                            "username": (
+                                row.get(
+                                    "username"
+                                ) or ""
+                            ),
+                            "firstname": (
+                                row.get(
+                                    "firstname"
+                                ) or ""
+                            ),
+                            "balance": int(
+                                row.get(
+                                    "balance"
+                                ) or 0
+                            ),
+                            "mininglevel": int(
+                                row.get(
+                                    "mininglevel"
+                                ) or 1
+                            ),
+                            "boost_level": int(
+                                row.get(
+                                    "boost_level"
+                                ) or 1
+                            ),
+                        }
+                    )
+
+                return self.json_response(
+                    200,
+                    {
+                        "success": True,
+                        "count": len(ranking),
+                        "ranking": ranking,
+                    },
+                )
+
+            except Exception as e:
+
+                log.exception(
+                    "rank"
+                )
+
+                return self.json_response(
+                    500,
+                    {
+                        "success": False,
+                        "error": str(e),
+                    },
+                )
+
+        return self.json_response(
+            404,
+            {
+                "success": False,
+                "error": "Not found",
+            },
+        )
+
+    def do_POST(self):
+
+        path = self.path.split(
+            "?",
+            1
+        )[0]
+
+        user = self.current_user()
+
+        if not user:
+
+            return self.json_response(
+                401,
+                {
+                    "success": False,
+                    "error": (
+                        "Invalid or expired Telegram session."
+                    ),
+                },
+            )
+
+        uid = int(user["id"])
+
+        body = self.read_json()
+
+        try:
+
+            if path == "/api/profile":
+
                 profile = ensure_profile(
                     user
                 )
@@ -845,19 +1030,360 @@ class APIHandler(BaseHTTPRequestHandler):
                     200,
                     {
                         "success": True,
-                        "profile":
-                            public_profile(
-                                profile
-                            ),
+                        "profile": public_profile(
+                            profile
+                        ),
                     },
                 )
 
-            except Exception as e:
-                log.exception(
-                    "Profile error"
+            if path == "/api/tap":
+
+                result = do_tap(
+                    uid,
+                    body.get(
+                        "count",
+                        1,
+                    ),
                 )
 
                 return self.json_response(
-                    500,
-                    {
-                        "success": False
+                    200,
+                    result,
+                )
+
+            if path == "/api/daily":
+
+                result = do_daily(
+                    uid
+                )
+
+                return self.json_response(
+                    200,
+                    result,
+                )
+
+            if path == "/api/upgrade":
+
+                result = do_upgrade(
+                    uid,
+                    str(
+                        body.get(
+                            "type",
+                            "",
+                        )
+                    ),
+                )
+
+                return self.json_response(
+                    200,
+                    result,
+                )
+
+            if path == "/api/channel-claim":
+
+                result = do_channel_claim(
+                    uid
+                )
+
+                return self.json_response(
+                    200,
+                    result,
+                )
+
+            return self.json_response(
+                404,
+                {
+                    "success": False,
+                    "error": "Not found",
+                },
+            )
+
+        except Exception as e:
+
+            log.exception(
+                "API request failed"
+            )
+
+            return self.json_response(
+                500,
+                {
+                    "success": False,
+                    "error": str(e),
+                },
+            )
+
+
+def run_http():
+
+    server = ThreadingHTTPServer(
+        (
+            "0.0.0.0",
+            PORT,
+        ),
+        APIHandler,
+    )
+
+    log.info(
+        "WORCOIN API listening on port %s",
+        PORT,
+    )
+
+    server.serve_forever()
+
+
+# ---------------------------------------------------------
+# TELEGRAM BOT COMMANDS
+# ---------------------------------------------------------
+
+async def start_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "▶ PLAY WORCOIN",
+                web_app=WebAppInfo(
+                    url=GAME_URL
+                ),
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🎯 Tasks",
+                callback_data="tasks",
+            ),
+            InlineKeyboardButton(
+                "💰 Balance",
+                callback_data="balance",
+            ),
+        ],
+    ]
+
+    await update.message.reply_text(
+        "WORCOIN Mining\n\n"
+        "Tap, complete tasks and upgrade your mining power.",
+        reply_markup=InlineKeyboardMarkup(
+            keyboard
+        ),
+    )
+
+
+async def balance_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+
+    uid = update.effective_user.id
+
+    try:
+
+        profile = get_profile(
+            uid
+        )
+
+        if not profile:
+
+            await update.message.reply_text(
+                "Open WORCOIN first to create your profile."
+            )
+
+            return
+
+        p = public_profile(
+            profile
+        )
+
+        await update.message.reply_text(
+            f"💰 Balance: {p['balance']:,} WOR\n"
+            f"⚡ Tap: +{p['tap_reward']} WOR\n"
+            f"⛏️ Mining Level: {p['mininglevel']}\n"
+            f"🚀 Boost Level: {p['boost_level']}\n"
+            f"🔋 Energy: "
+            f"{p['energy']:,}/"
+            f"{p['energy_capacity']:,}"
+        )
+
+    except Exception:
+
+        log.exception(
+            "balance command"
+        )
+
+        await update.message.reply_text(
+            "Could not load your balance right now."
+        )
+
+
+async def tasks_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "🎯 OPEN TASKS",
+                web_app=WebAppInfo(
+                    url=GAME_URL
+                ),
+            )
+        ]
+    ]
+
+    await update.message.reply_text(
+        "🎯 Tasks\n\n"
+        f"🎁 Daily Reward: +{DAILY_REWARD} WOR\n"
+        f"📣 Channel Join & Claim: +{CHANNEL_REWARD} WOR",
+        reply_markup=InlineKeyboardMarkup(
+            keyboard
+        ),
+    )
+
+
+async def button_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
+
+    query = update.callback_query
+
+    await query.answer()
+
+    if query.data == "balance":
+
+        uid = query.from_user.id
+
+        try:
+
+            p = public_profile(
+                get_profile(uid)
+            )
+
+            if not p:
+
+                await query.message.reply_text(
+                    "Open WORCOIN first."
+                )
+
+                return
+
+            await query.message.reply_text(
+                f"💰 {p['balance']:,} WOR\n"
+                f"⚡ +{p['tap_reward']} WOR/tap\n"
+                f"🔋 {p['energy']:,}/"
+                f"{p['energy_capacity']:,}"
+            )
+
+        except Exception:
+
+            await query.message.reply_text(
+                "Could not load balance."
+            )
+
+    elif query.data == "tasks":
+
+        await tasks_command(
+            update,
+            context,
+        )
+
+
+# ---------------------------------------------------------
+# START
+# ---------------------------------------------------------
+
+def main():
+
+    if not TOKEN:
+        raise RuntimeError(
+            "TELEGRAM_BOT_TOKEN is missing"
+        )
+
+    if (
+        not SUPABASE_URL
+        or not SUPABASE_SERVICE_ROLE_KEY
+    ):
+        raise RuntimeError(
+            "SUPABASE_URL / "
+            "SUPABASE_SERVICE_ROLE_KEY are missing"
+        )
+
+    Thread(
+        target=run_http,
+        daemon=True,
+    ).start()
+
+    app = (
+        Application
+        .builder()
+        .token(TOKEN)
+        .build()
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "start",
+            start_command,
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "balance",
+            balance_command,
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "tasks",
+            tasks_command,
+        )
+    )
+
+    app.add_handler(
+        CallbackQueryHandler(
+            button_callback
+        )
+    )
+
+    try:
+
+        telegram_call(
+            "setChatMenuButton",
+            {
+                "menu_button": {
+                    "type": "web_app",
+                    "text": "▶ PLAY WORCOIN",
+                    "web_app": {
+                        "url": GAME_URL
+                    },
+                }
+            },
+        )
+
+        log.info(
+            "Telegram menu button set to %s",
+            GAME_URL,
+        )
+
+    except Exception:
+
+        log.exception(
+            "Could not set Telegram menu button"
+        )
+
+    log.info(
+        "WORCOIN bot starting with Mini App URL: %s",
+        GAME_URL,
+    )
+
+    app.run_polling(
+        drop_pending_updates=True
+    )
+
+
+if __name__ == "__main__":
+    main()
