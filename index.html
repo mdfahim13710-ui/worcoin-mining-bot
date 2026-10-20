@@ -1,30 +1,212 @@
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>WORCOIN</title><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>WORCOIN Mining</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-*{box-sizing:border-box}html,body{margin:0;background:#030813;color:#fff;font-family:Arial,Helvetica,sans-serif}body{min-height:100vh}.app{max-width:520px;min-height:100vh;margin:auto;background:radial-gradient(circle at 50% 18%,#102d52 0,#071426 34%,#030813 72%);padding-bottom:82px}button{font:inherit}.top{padding:14px 14px 8px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:900;font-size:22px;letter-spacing:.5px}.balance{text-align:right}.balance small{display:block;color:#9eb2c9;font-size:11px}.balance b{font-size:18px}.page{padding:8px 12px}.card{background:linear-gradient(180deg,#0b1b2f,#071322);border:1px solid #17395b;border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 8px 28px #0007}.muted{color:#91a6bd;font-size:12px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.taparea{text-align:center;padding:4px 0 10px}.coin{width:280px;height:280px;border-radius:50%;margin:10px auto 12px;display:grid;place-items:center;background:radial-gradient(circle,#1a4f87 0 36%,#0d2a4c 37% 59%,#07172b 60%);border:9px solid #1b72c9;box-shadow:0 0 22px #168cffaa,0 0 60px #006fff44,inset 0 0 35px #58b5ff44;user-select:none;touch-action:none;transition:transform .06s}.coin:active{transform:scale(.965)}.coin img{width:62%;height:62%;object-fit:contain;filter:drop-shadow(0 0 10px #5bb9ff)}.cointext{font-size:58px;font-weight:900;color:#bfe6ff}.energybar{height:10px;background:#12243a;border-radius:99px;overflow:hidden;margin-top:8px}.energybar i{display:block;height:100%;background:linear-gradient(90deg,#1597ff,#4fdcff);border-radius:99px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:12px;padding:10px 12px;background:#1299ed;color:white;font-weight:800}.btn:disabled{opacity:.4}.pill{padding:5px 9px;border-radius:20px;background:#122d48;color:#b9d7f4;font-size:11px}.tabs{display:flex;gap:7px;overflow:auto;margin:8px 0}.tabs button{border:0;border-radius:20px;background:#112941;color:#a8bfd8;padding:8px 12px;white-space:nowrap}.tabs button.active{background:#159cf2;color:#fff}.item{display:flex;align-items:center;gap:10px;background:#081728;border:1px solid #12314e;border-radius:14px;padding:11px;margin-top:8px}.icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:#102b47;font-size:21px}.grow{flex:1;min-width:0}.reward{color:#ffd52a;font-weight:900}.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 3px calc(7px + env(safe-area-inset-bottom));background:#06111fef;border-top:1px solid #17334f;backdrop-filter:blur(12px)}.nav button{border:0;background:none;color:#8299b1;font-size:10px}.nav button.active{color:#fff}.nav .nicon{display:block;font-size:21px;margin-bottom:2px}.toast{position:fixed;top:15px;left:50%;transform:translateX(-50%);z-index:50;display:none;background:#102a43;border:1px solid #25557d;padding:9px 15px;border-radius:22px;font-size:12px}.rank{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px}.rankno{font-size:18px;font-weight:900;color:#ffd62b}.skin{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.skin button{border:1px solid #1c4162;background:#0b1b2d;border-radius:14px;padding:12px;color:#fff}.skin button.sel{border-color:#25aaff;box-shadow:0 0 15px #168cff55}.skinicon{width:58px;height:58px;border-radius:50%;margin:auto;background:radial-gradient(circle,#1d67ad,#08182a);border:3px solid #2489e7;display:grid;place-items:center;font-size:25px}.hidden{display:none}
-</style></head><body><div class="app"><header class="top"><div class="brand">WORCOIN</div><div class="balance"><small>Your balance</small><b id="topBalance">0 WOR</b></div></header><main id="content"></main><nav class="nav">
-<button data-page="home"><span class="nicon">⌂</span>Home</button><button data-page="frens"><span class="nicon">👥</span>Frens</button><button data-page="earn"><span class="nicon">☑</span>Earn</button><button data-page="boosts"><span class="nicon">🚀</span>Boosts</button><button data-page="rank"><span class="nicon">🏆</span>Rank</button></nav></div><div id="toast" class="toast"></div>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#050912;--card:#0d1725;--card2:#111f31;--line:#1c9cff;--text:#fff;--muted:#91a4b9;--gold:#ffd21c;--green:#28e38b}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-height:100%;overflow-x:hidden}
+body{padding-bottom:82px}
+.app{max-width:560px;margin:auto;padding:12px}
+.top{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px}
+.logo{width:44px;height:44px;border-radius:50%;border:2px solid #149dff;display:flex;align-items:center;justify-content:center;background:#07101d;box-shadow:0 0 18px #008cff55}
+.logoMark{position:relative;width:29px;height:29px}
+.logoMark:before,.logoMark:after{content:"";position:absolute;background:#fff;border-radius:3px}
+.logoMark:before{width:5px;height:20px;left:5px;top:1px;transform:rotate(27deg);box-shadow:18px 0 0 #fff}
+.logoMark:after{width:12px;height:4px;left:0;top:14px;box-shadow:17px -13px 0 #fff}
+.balance{text-align:center;margin-top:8px}
+.balance small{color:var(--muted)}
+.amount{font-size:34px;font-weight:900;margin-top:4px}
+.coinCard{background:radial-gradient(circle at 50% 42%,#163d64 0,#0a1726 52%,#08111d 100%);border:1px solid #158fff88;border-radius:24px;padding:18px 14px 15px;text-align:center;box-shadow:0 0 30px #008cff18}
+.tapCoin{width:250px;height:250px;max-width:72vw;max-height:72vw;margin:8px auto 12px;border-radius:50%;border:7px solid #168fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px #008cff77,inset 0 0 35px #008cff33;user-select:none;touch-action:manipulation;cursor:pointer}
+.tapCoin:active{transform:scale(.97)}
+.logoBig{transform:scale(2.8)}
+.energy{margin:0 auto;max-width:430px;text-align:left}
+.energyRow{display:flex;justify-content:space-between;color:#c5d4e5;font-size:13px;margin-bottom:7px}
+.bar{height:12px;border-radius:20px;background:#17283a;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,#00a6ff,#4bd9ff);border-radius:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat{background:var(--card);border:1px solid #1b3149;border-radius:13px;padding:10px;text-align:center}
+.stat b{display:block;font-size:16px}.stat span{font-size:11px;color:var(--muted)}
+.section{margin-top:14px}
+.card{background:var(--card);border:1px solid #19314b;border-radius:17px;padding:14px;margin-bottom:10px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.title{font-size:19px;font-weight:800;margin-bottom:4px}.muted{color:var(--muted);font-size:13px}
+button{border:0;border-radius:11px;padding:10px 14px;font-weight:800;background:#159dff;color:#fff}
+button:disabled{opacity:.45}
+.nav{position:fixed;z-index:20;bottom:0;left:0;right:0;background:#08111dF2;border-top:1px solid #1b3149;backdrop-filter:blur(12px)}
+.navIn{max-width:560px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.nav button{background:transparent;color:#8da1b7;border-radius:0;padding:9px 2px;font-size:11px}
+.nav button.active{color:#fff}.navIcon{font-size:20px;display:block;margin-bottom:2px}
+.page{display:none}.page.active{display:block}
+.task{display:flex;gap:10px;align-items:center}.taskIcon{width:42px;height:42px;border-radius:12px;background:#14283e;display:flex;align-items:center;justify-content:center;font-size:22px}
+.list{display:flex;flex-direction:column;gap:8px}
+.rank{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;background:#0c1826;border:1px solid #19314b;border-radius:12px;padding:10px}
+.rankNo{font-weight:900;color:var(--gold)}.avatar{width:34px;height:34px;border-radius:50%;background:#203b58;display:flex;align-items:center;justify-content:center}
+.upgrade{margin-top:10px}.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#14283e;color:#9fd8ff;font-size:11px}
+.notice{padding:11px;border-radius:12px;background:#10263b;border:1px solid #1a5d88;color:#cdeaff;font-size:12px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><div class="logo"><div class="logoMark"></div></div>WORCOIN</div>
+    <span class="pill" id="levelPill">LEVEL 1</span>
+  </div>
+
+  <div id="home" class="page active">
+    <div class="balance"><small>আপনার ব্যালেন্স</small><div class="amount"><span id="balance">0</span> WOR</div></div>
+    <div class="coinCard">
+      <div class="tapCoin" id="tapCoin" aria-label="Tap to mine"><div class="logoMark logoBig"></div></div>
+      <b>Tap to earn</b>
+      <div class="energy" style="margin-top:15px">
+        <div class="energyRow"><span>⚡ Energy</span><span id="energyText">1000/1000</span></div>
+        <div class="bar"><div class="fill" id="energyFill" style="width:100%"></div></div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="tapPower">1</b><span>WOR / tap</span></div>
+      <div class="stat"><b id="mineSpeed">1</b><span>Mining / sec</span></div>
+      <div class="stat"><b id="level">1</b><span>Level</span></div>
+    </div>
+    <div class="section">
+      <div class="card"><div class="row"><div><div class="title">Daily Reward</div><div class="muted">প্রতিদিন একবার WOR নিন</div></div><button id="dailyBtn">Claim +100</button></div></div>
+      <div class="notice">WORCOIN — Tap, complete tasks, upgrade and grow.</div>
+    </div>
+  </div>
+
+  <div id="frens" class="page">
+    <div class="title">👥 Frens</div><div class="muted">বন্ধু invite করে reward পান</div>
+    <div class="card"><div class="row"><div><b>Invite a friend</b><div class="muted">প্রতি সফল invite +500 WOR</div></div><button onclick="invite()">Invite</button></div></div>
+    <div class="card"><div class="title">Your Frens</div><div class="amount" style="font-size:25px" id="refCount">0</div></div>
+  </div>
+
+  <div id="tasks" class="page">
+    <div class="title">🎯 Earn / Tasks</div><div class="muted">Task সম্পন্ন করে WOR আয় করুন</div>
+    <div class="section" id="taskList"></div>
+  </div>
+
+  <div id="boosts" class="page">
+    <div class="title">⚡ Boosts</div><div class="muted">Mining আরও শক্তিশালী করুন</div>
+    <div class="section" id="boostList"></div>
+  </div>
+
+  <div id="rank" class="page">
+    <div class="title">🏆 Squad & Leaderboard</div><div class="muted">Public Top 100 ranking</div>
+    <div class="section" id="rankList"></div>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="navIn">
+    <button class="active" data-page="home"><span class="navIcon">🏠</span>Home</button>
+    <button data-page="frens"><span class="navIcon">👥</span>Frens</button>
+    <button data-page="tasks"><span class="navIcon">🎯</span>Earn</button>
+    <button data-page="boosts"><span class="navIcon">⚡</span>Boosts</button>
+    <button data-page="rank"><span class="navIcon">🏆</span>Rank</button>
+  </div>
+</div>
+
 <script>
-const tg=window.Telegram?.WebApp;tg?.ready();tg?.expand();
-const C=document.getElementById('content');let profile=null,current='home';let tapping=false;
-async function api(path,method='GET',body=null){const opt={method,headers:{'X-Telegram-Init-Data':tg?.initData||''}};if(body){opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(body)}const r=await fetch(path,opt);return await r.json()}
-const fmt=n=>Number(n||0).toLocaleString();function toast(s){const x=document.getElementById('toast');x.textContent=s;x.style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>x.style.display='none',1800)}
-function setNav(){document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===current));document.getElementById('topBalance').textContent=fmt(profile?.balance)+' WOR'}
-function shell(html){C.innerHTML='<div class="page">'+html+'</div>';setNav()}
-function home(){const e=Math.max(0,Number(profile.energy||0)),cap=Math.max(1,Number(profile.energy_capacity||1000));shell(`<div class="card"><div class="row"><div><div class="muted">Your balance</div><h2 style="margin:4px 0">${fmt(profile.balance)} WOR</h2></div><span class="pill">${profile.league||'Bronze'} League</span></div></div><div class="taparea"><div id="coin" class="coin"><span class="cointext">W</span></div><b>Tap to earn</b><div class="muted">+${profile.tap_reward||1} WOR per tap</div></div><div class="card"><div class="row"><span>⚡ Energy</span><b>${fmt(e)}/${fmt(cap)}</b></div><div class="energybar"><i style="width:${Math.min(100,e/cap*100)}%"></i></div><div class="row" style="margin-top:9px"><span class="muted">Recharging</span><span class="muted">${profile.regen_rate||1}/sec</span></div></div><div class="card"><div class="row"><b>🏅 Your League</b><b>${profile.league||'Bronze'}</b></div><div class="muted" style="margin-top:7px">${fmt(profile.balance)} / ${fmt(profile.next_league_target||10000)} WOR</div></div>`);document.getElementById('coin').onpointerdown=()=>tap()}
-async function tap(){if(tapping)return;tapping=true;const j=await api('/api/tap','POST',{count:1});tapping=false;if(j.success){profile=j.profile;home()}else toast(j.message||j.error||'Tap failed')}
-async function frens(){const j=await api('/api/referrals');shell(`<div class="card"><h2>Frens</h2><div class="muted">Invite your friends and get rewards</div><div class="item"><div class="icon">🎁</div><div class="grow"><b>Invite a friend</b><br><span class="reward">+${fmt(profile.referral_reward||500)} WOR</span></div><button class="btn" id="invite">Invite</button></div><div class="row" style="margin-top:14px"><span>Your friends</span><b>${fmt(profile.refer_count)}</b></div></div><div class="card"><h3>Top Frens</h3>${(j.referrals||[]).map((x,i)=>`<div class="item"><b>${i+1}</b><div class="grow"><b>${x.username?'@'+x.username:(x.firstname||'User')}</b></div><span class="reward">${fmt(x.balance)} WOR</span></div>`).join('')||'<div class="muted" style="padding:12px">No friends yet.</div>'}</div>`);document.getElementById('invite').onclick=()=>{const u=`https://t.me/WORMiningBot?start=ref_${profile.telegram_id}`;tg?.openTelegramLink?.('https://t.me/share/url?url='+encodeURIComponent(u)+'&text='+encodeURIComponent('Join WORCOIN and earn WOR!'))}}
-async function earn(){const j=await api('/api/tasks');shell(`<div class="card"><h2>Earn</h2><div class="tabs"><button class="active">All</button><button>Social</button><button>Web3</button><button>Special</button></div>${(j.tasks||[]).map(t=>`<div class="item"><div class="icon">🎯</div><div class="grow"><b>${t.title}</b><br><span class="reward">+${fmt(t.reward)} WOR</span><br><span class="muted">${t.description||''}</span></div>${t.task_url?`<button class="btn" onclick="openTask(${t.id},'${encodeURIComponent(t.task_url)}')">${t.claimed?'✓':'Start'}</button>`:''}</div>`).join('')}</div><div class="card"><div class="item"><div class="icon">🎁</div><div class="grow"><b>Daily Bonus</b><br><span class="reward">+${fmt(profile.daily_reward||100)} WOR</span></div><button class="btn" onclick="daily()">Claim</button></div><div class="item"><div class="icon">📣</div><div class="grow"><b>Join Telegram Channel</b><br><span class="reward">+${fmt(profile.channel_reward||1000)} WOR</span></div><button class="btn" onclick="channel()">Claim</button></div></div>`)}
-async function openTask(id,url){if(url){try{tg?.openTelegramLink?.(decodeURIComponent(url))||window.open(decodeURIComponent(url),'_blank')}catch(e){window.open(decodeURIComponent(url),'_blank')}}const j=await api('/api/task','POST',{id});if(j.success){profile=j.profile;toast('Reward claimed!');earn()}else if(j.message)toast(j.message)}
-async function daily(){const j=await api('/api/daily','POST');if(j.success){profile=j.profile;toast('Daily reward claimed');earn()}else toast(j.message||j.error||'Already claimed')}
-async function channel(){tg?.openTelegramLink?.('https://t.me/owlcoin137');setTimeout(async()=>{const j=await api('/api/channel-claim','POST');if(j.success){profile=j.profile;toast('Channel reward claimed');earn()}else toast(j.message||'Join the channel first')},1200)}
-async function boosts(){const items=[['boost','🔥','Multitap',profile.boost_level,profile.next_boost_cost,`+${profile.tap_reward||1} WOR/tap`],['energy','⚡','Energy Limit',profile.energy_level,profile.next_energy_cost,`${fmt(profile.energy_capacity)} energy`],['regen','⚡','Recharging Speed',profile.regen_level||1,profile.next_regen_cost,`${profile.regen_rate||1}/sec`],['auto','⏱','Auto Tap',profile.auto_level||1,profile.next_auto_cost,`+${profile.auto_rate||0} WOR/sec`]];shell(`<div class="card"><h2>Boosts</h2><div class="muted">Use boosts to earn more WOR</div>${items.map(a=>`<div class="item"><div class="icon">${a[1]}</div><div class="grow"><b>${a[2]}</b><br><span class="muted">Lv. ${a[3]} • ${a[5]}</span></div><button class="btn" ${a[4]==null?'disabled':''} onclick="upgrade('${a[0]}')">${a[4]==null?'MAX':fmt(a[4])}</button></div>`).join('')}<div class="grid2" style="margin-top:10px"><button class="btn" onclick="boost('turbo')">Turbo</button><button class="btn" onclick="boost('full_energy')">Full Energy</button></div></div><div class="card"><h3>Skins</h3><div class="skin">${['Default','Diamond','Fire','Cyber','Galaxy','Christmas'].map((s,i)=>`<button class="${(profile.skin||'Default')===s?'sel':''}" onclick="skin('${s}')"><div class="skinicon">${i===0?'W':i===1?'◇':i===2?'🔥':i===3?'◈':i===4?'✦':'🎄'}</div><small>${s}</small></button>`).join('')}</div></div>`)}
-async function upgrade(type){const j=await api('/api/upgrade','POST',{type});if(j.success){profile=j.profile;toast('Upgrade successful');boosts()}else toast(j.message||j.error||'Not enough WOR')}
-async function boost(type){const j=await api('/api/boost','POST',{type});if(j.success){profile=j.profile;toast(j.message||'Activated');boosts()}else toast(j.message||j.error||'Unavailable')}
-async function skin(name){const j=await api('/api/skin','POST',{skin:name});if(j.success){profile=j.profile;boosts()}else toast(j.message||j.error||'Unavailable')}
-async function rank(){const j=await api('/api/rank');shell(`<div class="card"><h2>Squad & Leaderboard</h2><div class="tabs"><button class="active">Global</button><button>Friends</button><button>Squad</button></div>${(j.ranking||[]).map(x=>`<div class="item rank"><span class="rankno">${x.rank}</span><div class="grow"><b>${x.username?'@'+x.username:(x.firstname||'User')}</b><br><span class="muted">Lv.${x.level||1}</span></div><span class="reward">${fmt(x.balance)}</span></div>`).join('')||'<div class="muted">No ranking yet.</div>'}</div>`)}
-async function load(){const j=await api('/api/profile');if(j.success){profile=j.profile;render()}else C.innerHTML='<div class="page"><div class="card"><h2>WORCOIN</h2><p>Open WORCOIN from Telegram.</p></div></div>'}function render(){setNav();if(current==='home')home();if(current==='frens')frens();if(current==='earn')earn();if(current==='boosts')boosts();if(current==='rank')rank()}
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{current=b.dataset.page;render()});load();
-</script></body></html>
+const tg=window.Telegram?.WebApp;
+tg?.ready(); tg?.expand();
+
+const KEY="worcoin_data_v1";
+const defaults={balance:0,energy:1000,maxEnergy:1000,level:1,tapPower:1,mineSpeed:1,last:Date.now(),daily:"",refCount:0,boosts:{tap:1,energy:1,speed:1}};
+let data=JSON.parse(localStorage.getItem(KEY)||"null")||defaults;
+data={...defaults,...data,boosts:{...defaults.boosts,...(data.boosts||{})}};
+
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function fmt(n){return Math.floor(n).toLocaleString("en-US")}
+function today(){return new Date().toISOString().slice(0,10)}
+function regen(){
+  const now=Date.now(), sec=Math.floor((now-data.last)/1000);
+  if(sec>0){data.energy=Math.min(data.maxEnergy,data.energy+sec*data.boosts.speed);data.last=now;save()}
+}
+function render(){
+  regen();
+  document.getElementById("balance").textContent=fmt(data.balance);
+  document.getElementById("energyText").textContent=`${fmt(data.energy)}/${fmt(data.maxEnergy)}`;
+  document.getElementById("energyFill").style.width=(data.energy/data.maxEnergy*100)+"%";
+  document.getElementById("tapPower").textContent=data.tapPower;
+  document.getElementById("mineSpeed").textContent=data.mineSpeed;
+  document.getElementById("level").textContent=data.level;
+  document.getElementById("levelPill").textContent="LEVEL "+data.level;
+  document.getElementById("refCount").textContent=data.refCount;
+  renderBoosts(); renderRanks();
+}
+function tap(){
+  regen(); if(data.energy<=0)return;
+  data.balance+=data.tapPower; data.energy--; data.last=Date.now(); save(); render();
+}
+document.getElementById("tapCoin").addEventListener("pointerdown",tap);
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(b.dataset.page).classList.add("active");
+});
+
+document.getElementById("dailyBtn").onclick=()=>{
+  if(data.daily===today()) return alert("আজকের reward ইতিমধ্যে নেওয়া হয়েছে।");
+  data.balance+=100;data.daily=today();save();render();alert("+100 WOR যোগ হয়েছে!");
+};
+
+function invite(){
+  const bot=location.origin+location.pathname;
+  const u="https://t.me/share/url?url="+encodeURIComponent(bot)+"&text="+encodeURIComponent("WORCOIN-এ join করুন!");
+  if(tg?.openTelegramLink)tg.openTelegramLink(u);else location.href=u;
+}
+
+function renderBoosts(){
+ const arr=[
+  ["👆","Tap Boost","প্রতি tap-এ WOR","tap",1000,()=>{data.tapPower++;}],
+  ["🔋","Energy Capacity","Max energy +250","energy",1500,()=>{data.maxEnergy+=250;data.energy=data.maxEnergy;}],
+  ["⚡","Mining Speed","Energy recharge দ্রুত","speed",2000,()=>{data.boosts.speed++;}],
+  ["📈","Level Upgrade","Tap power +1 এবং level +1","level",5000,()=>{data.level++;data.tapPower++;}]
+ ];
+ document.getElementById("boostList").innerHTML=arr.map((x,i)=>{
+   const lvl=x[3]==="level"?data.level:(data.boosts[x[3]]||1);
+   const cost=x[4]*lvl;
+   return `<div class="card"><div class="row"><div><b>${x[0]} ${x[1]}</b><div class="muted">${x[2]} • Level ${lvl}</div></div><button onclick="upgrade(${i})">${fmt(cost)} WOR</button></div></div>`;
+ }).join("");
+}
+window.upgrade=(i)=>{
+ const cfg=[
+  ["tap",1000,()=>{data.boosts.tap++;data.tapPower++;}],
+  ["energy",1500,()=>{data.boosts.energy++;data.maxEnergy+=250;data.energy=data.maxEnergy;}],
+  ["speed",2000,()=>{data.boosts.speed++;}],
+  ["level",5000,()=>{data.level++;data.tapPower++;}]
+ ][i];
+ const lvl=cfg[0]==="level"?data.level:data.boosts[cfg[0]];
+ const cost=cfg[1]*lvl;
+ if(data.balance<cost)return alert("পর্যাপ্ত WOR নেই।");
+ data.balance-=cost;cfg[2]();save();render();
+};
+
+function renderTasks(){
+ const tasks=[
+  ["📢","WORCOIN Channel Join","+10,000 WOR","https://t.me/"],
+  ["📣","WORCOIN Community","পরবর্তী task শীঘ্রই",""],
+  ["👥","Invite Friends","+500 WOR / friend",""]
+ ];
+ document.getElementById("taskList").innerHTML=tasks.map((t,i)=>`<div class="card task"><div class="taskIcon">${t[0]}</div><div style="flex:1"><b>${t[1]}</b><div class="muted">${t[2]}</div></div><button onclick="task(${i})">${i===0?"Open":"Start"}</button></div>`).join("");
+}
+window.task=(i)=>{
+ if(i===0){ if(tg?.openTelegramLink)tg.openTelegramLink("https://t.me/owlcoin137"); else window.open("https://t.me/owlcoin137","_blank"); }
+ else alert("এই task পরে চালু হবে।");
+};
+function renderRanks(){
+ const names=["TopMiner","WorMaster","CryptoKing","TapHero","WorLegend","MiningPro","DiamondWOR","WORPlayer","FastMiner","WorStar"];
+ document.getElementById("rankList").innerHTML=names.map((n,i)=>`<div class="rank"><div class="rankNo">${i+1}</div><div class="row" style="justify-content:flex-start"><div class="avatar">👤</div><div><b>@${n}</b><div class="muted">WOR Miner</div></div></div><b>${fmt(1000000-i*73111)}</b></div>`).join("");
+}
+renderTasks();render();
+setInterval(render,1000);
+</script>
+</body>
+</html>
