@@ -3,525 +3,555 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <title>WORCOIN Mining</title>
 
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent
+}
 
 :root{
---bg:#06090f;
---panel:#111827;
---text:#fff;
---muted:#91a1b8;
---blue:#2d8cff;
---green:#39e58c;
+  --bg:#06090f;
+  --panel:#111827;
+  --panel2:#182235;
+  --text:#fff;
+  --muted:#91a1b8;
+  --red:#ff2338;
+  --gold:#ffd34d;
+  --green:#39e58c
 }
 
 html,body{
-margin:0;
-width:100%;
-min-height:100%;
-background:var(--bg);
-color:var(--text);
-font-family:Arial,sans-serif
+  margin:0;
+  width:100%;
+  min-height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif
 }
 
 body{
-min-height:100dvh;
-overflow:hidden;
-background:
-radial-gradient(circle at 50% 18%,#182b46 0,#0b1421 42%,#05070b 100%)
+  min-height:100dvh;
+  overflow:hidden;
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      #182b46 0,
+      #0b1421 42%,
+      #05070b 100%
+    )
 }
 
 button{
-font:inherit;
-color:inherit;
-border:0
+  font:inherit;
+  color:inherit;
+  border:0
 }
 
 .app{
-width:100%;
-max-width:520px;
-height:100dvh;
-margin:auto;
-display:flex;
-flex-direction:column
+  width:100%;
+  max-width:520px;
+  height:100dvh;
+  margin:auto;
+  display:flex;
+  flex-direction:column
 }
 
 .top{
-padding:14px 18px 8px;
-display:flex;
-align-items:center;
-justify-content:space-between
+  padding:14px 18px 8px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between
 }
 
 .brand{
-font-weight:900;
-font-size:21px;
-letter-spacing:1.5px
+  font-weight:900;
+  font-size:21px;
+  letter-spacing:1.5px
 }
 
 .user{
-width:38px;
-height:38px;
-border-radius:50%;
-background:#1c2a3e;
-display:grid;
-place-items:center;
-font-size:16px;
-font-weight:900
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:#1c2a3e;
+  display:grid;
+  place-items:center;
+  font-size:18px
 }
 
 .page{
-flex:1;
-overflow:auto;
-padding:4px 16px 94px
+  flex:1;
+  overflow:auto;
+  padding:4px 16px 94px
 }
 
 .page::-webkit-scrollbar{
-display:none
+  display:none
 }
 
 .screen{
-display:none;
-animation:fade .18s ease
+  display:none;
+  animation:fade .18s ease
 }
 
 .screen.active{
-display:block
+  display:block
 }
 
 @keyframes fade{
-from{opacity:.3;transform:translateY(5px)}
-to{opacity:1;transform:none}
+  from{
+    opacity:.3;
+    transform:translateY(5px)
+  }
+  to{
+    opacity:1;
+    transform:none
+  }
 }
 
 .balance{
-text-align:center;
-margin-top:10px
+  text-align:center;
+  margin-top:10px
 }
 
 .balance .label{
-font-size:12px;
-letter-spacing:2.5px;
-color:var(--muted)
+  font-size:12px;
+  letter-spacing:2.5px;
+  color:var(--muted)
 }
 
 .balance .num{
-font-size:39px;
-font-weight:900;
-margin-top:5px
+  font-size:39px;
+  font-weight:900;
+  margin-top:5px
 }
 
 .level{
-text-align:center;
-color:#b9c6d8;
-font-size:12px;
-margin-top:4px
+  text-align:center;
+  color:#b9c6d8;
+  font-size:12px;
+  margin-top:4px
 }
 
 .mine-wrap{
-display:flex;
-flex-direction:column;
-align-items:center;
-margin-top:14px
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin-top:14px
 }
 
-/* BIG WOR TAP CIRCLE */
-
 .tap-zone{
-width:min(88vw,360px);
-height:min(88vw,360px);
-border-radius:50%;
-display:grid;
-place-items:center;
-position:relative;
-cursor:pointer;
-touch-action:none;
-background:transparent;
-outline:0;
-user-select:none
+  width:min(88vw,360px);
+  height:min(88vw,360px);
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  position:relative;
+  cursor:pointer;
+  touch-action:none;
+  background:transparent;
+  outline:0;
+  user-select:none
 }
 
 .tap-zone:before{
-content:"";
-position:absolute;
-inset:0;
-border-radius:50%;
-background:
-radial-gradient(
-circle,
-#1b2f4d 0,
-#0d1828 52%,
-#070b12 72%
-);
-box-shadow:
-0 0 0 2px #1f5da8,
-0 0 55px #2d8cff44,
-inset 0 0 40px #2d8cff28
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:
+    radial-gradient(
+      circle,
+      #2a0c12 0,
+      #13090d 52%,
+      #08090d 72%
+    );
+  box-shadow:
+    0 0 0 2px #4d1720,
+    0 0 55px #ff203844,
+    inset 0 0 40px #ff203828
 }
 
 .tap-zone:active{
-transform:scale(.97)
+  transform:scale(.97)
 }
 
 .logo-ring{
-position:absolute;
-inset:9px;
-border-radius:50%;
-display:grid;
-place-items:center;
-border:3px solid #2d8cffaa;
-box-shadow:
-inset 0 0 26px #2d8cff33,
-0 0 30px #2d8cff2b
+  position:absolute;
+  inset:9px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  border:3px solid #ff2639aa;
+  box-shadow:
+    inset 0 0 26px #ff233833,
+    0 0 30px #ff23382b
 }
 
-.wor-mark{
-font-size:64px;
-font-weight:1000;
-letter-spacing:-4px;
-color:#fff;
-text-shadow:
-0 0 18px #2d8cff,
-0 0 42px #2d8cff66
+.logo-ring img{
+  width:82%;
+  height:82%;
+  object-fit:contain;
+  filter:drop-shadow(
+    0 0 15px #ff1f33
+  )
 }
 
 .tap-text{
-position:absolute;
-bottom:18px;
-font-size:11px;
-letter-spacing:1.5px;
-color:#d7deea;
-font-weight:800
+  position:absolute;
+  bottom:18px;
+  font-size:11px;
+  letter-spacing:1.5px;
+  color:#d7deea;
+  font-weight:800
 }
 
 .float{
-position:absolute;
-pointer-events:none;
-font-weight:900;
-color:#fff;
-font-size:22px;
-animation:floatUp .75s ease-out forwards;
-text-shadow:0 0 12px #2d8cff
+  position:absolute;
+  pointer-events:none;
+  font-weight:900;
+  color:#fff;
+  font-size:22px;
+  animation:floatUp .75s ease-out forwards;
+  text-shadow:0 0 12px #ff2338
 }
 
 @keyframes floatUp{
-0%{
-opacity:1;
-transform:translateY(0) scale(1)
-}
-100%{
-opacity:0;
-transform:translateY(-75px) scale(1.2)
-}
+  0%{
+    opacity:1;
+    transform:translateY(0) scale(1)
+  }
+
+  100%{
+    opacity:0;
+    transform:translateY(-75px) scale(1.2)
+  }
 }
 
 .energy{
-width:100%;
-max-width:380px;
-margin:18px auto 0
+  width:100%;
+  max-width:380px;
+  margin:18px auto 0
 }
 
 .energy-row{
-display:flex;
-justify-content:space-between;
-font-size:12px;
-color:#aab8ca;
-margin-bottom:7px
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:#aab8ca;
+  margin-bottom:7px
 }
 
 .bar{
-height:9px;
-border-radius:99px;
-background:#222d3d;
-overflow:hidden
+  height:9px;
+  border-radius:99px;
+  background:#222d3d;
+  overflow:hidden
 }
 
 .bar i{
-display:block;
-height:100%;
-width:100%;
-background:linear-gradient(
-90deg,
-#2d8cff,
-#39e58c
-);
-border-radius:99px;
-transition:width .2s
+  display:block;
+  height:100%;
+  width:100%;
+  background:
+    linear-gradient(
+      90deg,
+      #ff253a,
+      #ffd34d
+    );
+  border-radius:99px;
+  transition:width .2s
 }
 
 .quick{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:14px
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:14px
 }
 
 .card{
-background:linear-gradient(
-145deg,
-#151f30,
-#0e1520
-);
-border:1px solid #263349;
-border-radius:16px;
-padding:14px
+  background:
+    linear-gradient(
+      145deg,
+      #151f30,
+      #0e1520
+    );
+  border:1px solid #263349;
+  border-radius:16px;
+  padding:14px
 }
 
 .card .small{
-color:var(--muted);
-font-size:11px
+  color:var(--muted);
+  font-size:11px
 }
 
 .card .big{
-font-weight:800;
-font-size:17px;
-margin-top:5px
+  font-weight:800;
+  font-size:17px;
+  margin-top:5px
 }
 
 .action{
-width:100%;
-padding:13px;
-border-radius:13px;
-background:#202c40;
-font-weight:800;
-margin-top:10px
+  width:100%;
+  padding:13px;
+  border-radius:13px;
+  background:#202c40;
+  font-weight:800;
+  margin-top:10px
 }
 
 .action.primary{
-background:linear-gradient(
-90deg,
-#1685ff,
-#2d8cff
-)
+  background:
+    linear-gradient(
+      90deg,
+      #e91d35,
+      #ff4a4a
+    )
 }
 
 .section-title{
-font-size:22px;
-font-weight:900;
-margin:14px 2px 12px
+  font-size:22px;
+  font-weight:900;
+  margin:14px 2px 12px
 }
 
 .list{
-display:flex;
-flex-direction:column;
-gap:10px
+  display:flex;
+  flex-direction:column;
+  gap:10px
 }
 
 .task,
+.friend,
 .boost,
 .rank{
-background:linear-gradient(
-145deg,
-#151f30,
-#0d141f
-);
-border:1px solid #263349;
-border-radius:15px;
-padding:14px;
-display:flex;
-align-items:center;
-gap:12px
+  background:
+    linear-gradient(
+      145deg,
+      #151f30,
+      #0d141f
+    );
+  border:1px solid #263349;
+  border-radius:15px;
+  padding:14px;
+  display:flex;
+  align-items:center;
+  gap:12px
 }
 
 .icon{
-width:44px;
-height:44px;
-border-radius:12px;
-background:#202c40;
-display:grid;
-place-items:center;
-font-size:22px;
-flex:none
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  background:#202c40;
+  display:grid;
+  place-items:center;
+  font-size:22px;
+  flex:none
 }
 
 .info{
-flex:1;
-min-width:0
+  flex:1;
+  min-width:0
 }
 
 .info strong{
-display:block;
-font-size:14px
+  display:block;
+  font-size:14px
 }
 
 .info span{
-display:block;
-color:var(--muted);
-font-size:11px;
-margin-top:4px
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px
 }
 
 .pill{
-background:#26354b;
-color:#fff;
-border:1px solid #34445b;
-border-radius:10px;
-padding:8px 11px;
-font-size:11px;
-font-weight:800
+  background:#26354b;
+  color:#fff;
+  border:1px solid #34445b;
+  border-radius:10px;
+  padding:8px 11px;
+  font-size:11px;
+  font-weight:800
 }
 
 .pill.done{
-background:#123122;
-color:var(--green);
-border-color:#1c5b3a
+  background:#123122;
+  color:var(--green);
+  border-color:#1c5b3a
 }
 
 .invite{
-background:linear-gradient(
-145deg,
-#101b2b,
-#101722
-);
-border:1px solid #263c5b;
-border-radius:18px;
-padding:18px;
-text-align:center
+  background:
+    linear-gradient(
+      145deg,
+      #23121a,
+      #101722
+    );
+  border:1px solid #5b2029;
+  border-radius:18px;
+  padding:18px;
+  text-align:center
 }
 
 .invite h2{
-margin:0 0 8px
+  margin:0 0 8px
 }
 
 .invite p{
-margin:0;
-color:var(--muted);
-font-size:12px;
-line-height:1.5
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5
 }
 
 .refbox{
-margin-top:14px;
-background:#0a1018;
-border:1px dashed #34445b;
-border-radius:12px;
-padding:11px;
-font-size:12px;
-word-break:break-all;
-color:#dce6f4
+  margin-top:14px;
+  background:#0a1018;
+  border:1px dashed #34445b;
+  border-radius:12px;
+  padding:11px;
+  font-size:12px;
+  word-break:break-all;
+  color:#dce6f4
 }
 
 .boost button{
-margin-left:auto;
-background:#26354b;
-padding:9px 12px;
-border-radius:10px;
-font-size:11px;
-font-weight:800
+  margin-left:auto;
+  background:#26354b;
+  padding:9px 12px;
+  border-radius:10px;
+  font-size:11px;
+  font-weight:800
 }
 
 .boost button:disabled{
-opacity:.45
+  opacity:.45
 }
 
 .rank .pos{
-width:30px;
-font-size:18px;
-font-weight:900;
-text-align:center
+  width:30px;
+  font-size:18px;
+  font-weight:900;
+  text-align:center
 }
 
 .rank .avatar{
-width:40px;
-height:40px;
-border-radius:50%;
-background:#202c40;
-display:grid;
-place-items:center;
-font-weight:900
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:#202c40;
+  display:grid;
+  place-items:center;
+  overflow:hidden
+}
+
+.rank .avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover
 }
 
 .rank .score{
-margin-left:auto;
-font-weight:900
+  margin-left:auto;
+  font-weight:900
 }
 
 .empty{
-padding:30px 15px;
-text-align:center;
-color:var(--muted);
-font-size:13px
+  padding:30px 15px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px
 }
 
 .notice{
-padding:11px;
-border-radius:12px;
-background:#0e1724;
-color:#aab8ca;
-font-size:12px;
-margin:10px 0
+  padding:11px;
+  border-radius:12px;
+  background:#0e1724;
+  color:#aab8ca;
+  font-size:12px;
+  margin:10px 0
 }
 
 .nav{
-position:fixed;
-left:50%;
-bottom:0;
-transform:translateX(-50%);
-width:100%;
-max-width:520px;
-height:82px;
-padding:8px 8px calc(
-8px + env(safe-area-inset-bottom)
-);
-background:#080d15ee;
-backdrop-filter:blur(14px);
-border-top:1px solid #202b3c;
-display:grid;
-grid-template-columns:repeat(5,1fr);
-z-index:20
+  position:fixed;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:520px;
+  height:82px;
+  padding:
+    8px
+    8px
+    calc(8px + env(safe-area-inset-bottom));
+  background:#080d15ee;
+  backdrop-filter:blur(14px);
+  border-top:1px solid #202b3c;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  z-index:20
 }
 
 .nav button{
-background:transparent;
-color:#738197;
-font-size:10px;
-font-weight:700;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:4px
+  background:transparent;
+  color:#738197;
+  font-size:10px;
+  font-weight:700;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px
 }
 
 .nav button b{
-font-size:20px
+  font-size:20px
 }
 
 .nav button.active{
-color:#fff
+  color:#fff
 }
 
 .nav button.active b{
-filter:drop-shadow(
-0 0 7px #2d8cff
-)
+  filter:drop-shadow(
+    0 0 7px #ff2639
+  )
 }
 
 .toast{
-position:fixed;
-left:50%;
-bottom:94px;
-transform:translateX(-50%) translateY(20px);
-background:#fff;
-color:#111;
-padding:10px 15px;
-border-radius:999px;
-font-size:12px;
-font-weight:800;
-opacity:0;
-pointer-events:none;
-transition:.2s;
-z-index:30;
-max-width:90%;
-text-align:center
+  position:fixed;
+  left:50%;
+  bottom:94px;
+  transform:
+    translateX(-50%)
+    translateY(20px);
+  background:#fff;
+  color:#111;
+  padding:10px 15px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
+  z-index:30;
+  max-width:90%;
+  text-align:center
 }
 
 .toast.show{
-opacity:1;
-transform:translateX(-50%)
+  opacity:1;
+  transform:translateX(-50%)
 }
 </style>
 </head>
@@ -531,34 +561,45 @@ transform:translateX(-50%)
 <div class="app">
 
 <header class="top">
-<div class="brand">WORCOIN</div>
-<div class="user" id="userIcon">W</div>
+  <div class="brand">WORCOIN</div>
+  <div class="user" id="userIcon">👤</div>
 </header>
 
 <main class="page">
 
-<!-- HOME -->
-
 <section id="home" class="screen active">
 
 <div class="balance">
-<div class="label">YOUR BALANCE</div>
-<div class="num" id="balance">0 WOR</div>
+
+<div class="label">
+YOUR BALANCE
+</div>
+
+<div class="num" id="balance">
+0 WOR
+</div>
+
 <div class="level" id="level">
 Mining Level 1 • +1 WOR/tap
 </div>
+
 </div>
 
 <div class="mine-wrap">
 
 <button
-class="tap-zone"
-id="mineBtn"
-aria-label="Tap to mine"
+  class="tap-zone"
+  id="mineBtn"
+  aria-label="Tap to mine"
 >
 
 <div class="logo-ring">
-<div class="wor-mark">WOR</div>
+
+<img
+  src="/wor-tap-logo.png"
+  alt="WORCOIN"
+>
+
 </div>
 
 <div class="tap-text">
@@ -570,65 +611,91 @@ TAP TO MINE
 <div class="energy">
 
 <div class="energy-row">
-<span>⚡ Energy</span>
+
+<span>
+⚡ Energy
+</span>
+
 <b id="energyText">
 0 / 1000
 </b>
+
 </div>
 
 <div class="bar">
+
 <i id="energyBar"></i>
+
 </div>
 
 </div>
+
 </div>
 
 <div class="quick">
 
 <div class="card">
-<div class="small">Tap Reward</div>
-<div class="big" id="power">
+
+<div class="small">
+Mining power
+</div>
+
+<div
+  class="big"
+  id="power"
+>
 +1 / tap
 </div>
+
 </div>
 
 <div class="card">
-<div class="small">Mining Speed</div>
-<div class="big" id="miningSpeed">
+
+<div class="small">
+Mining speed
+</div>
+
+<div
+  class="big"
+  id="miningSpeed"
+>
 1 WOR/sec
 </div>
+
 </div>
 
 </div>
 
 <div
-id="homeNotice"
-class="notice"
-style="display:none"
+  id="homeNotice"
+  class="notice"
+  style="display:none"
 ></div>
 
 </section>
 
 
-<!-- MINE -->
-
-<section id="mining" class="screen">
+<section
+  id="mining"
+  class="screen"
+>
 
 <div class="section-title">
 ⛏️ Mine & Upgrade
 </div>
 
 <div
-class="list"
-id="upgradeList"
+  class="list"
+  id="upgradeList"
 ></div>
 
 </section>
 
 
-<!-- INVITE -->
-
-<section id="friends" class="screen">
+<section
+  id="friends"
+  class="screen"
+>
 
 <div class="section-title">
 👥 Invite Friends
@@ -645,15 +712,15 @@ Share your personal WORCOIN invite link with friends.
 </p>
 
 <div
-class="refbox"
-id="refLink"
+  class="refbox"
+  id="refLink"
 >
 Loading invite link…
 </div>
 
 <button
-class="action primary"
-id="shareBtn"
+  class="action primary"
+  id="shareBtn"
 >
 Invite Friend
 </button>
@@ -671,8 +738,8 @@ INVITED FRIENDS
 </div>
 
 <div
-class="big"
-id="refCount"
+  class="big"
+  id="refCount"
 >
 0
 </div>
@@ -682,25 +749,27 @@ id="refCount"
 </section>
 
 
-<!-- TASKS -->
-
-<section id="tasks" class="screen">
+<section
+  id="tasks"
+  class="screen"
+>
 
 <div class="section-title">
 📋 Tasks
 </div>
 
 <div
-class="list"
-id="taskList"
+  class="list"
+  id="taskList"
 ></div>
 
 </section>
 
 
-<!-- RANK -->
-
-<section id="rank" class="screen">
+<section
+  id="rank"
+  class="screen"
+>
 
 <div class="section-title">
 🏆 WORCOIN Rank
@@ -719,8 +788,8 @@ Public ranking
 </div>
 
 <div
-class="list"
-id="rankList"
+  class="list"
+  id="rankList"
 ></div>
 
 </section>
@@ -728,41 +797,39 @@ id="rankList"
 </main>
 
 
-<!-- NAV -->
-
 <nav class="nav">
 
 <button
-class="active"
-data-screen="home"
+  class="active"
+  data-screen="home"
 >
 <b>⌂</b>
 Home
 </button>
 
 <button
-data-screen="mining"
+  data-screen="mining"
 >
 <b>⛏</b>
 Mine
 </button>
 
 <button
-data-screen="friends"
+  data-screen="friends"
 >
 <b>👥</b>
 Invite
 </button>
 
 <button
-data-screen="tasks"
+  data-screen="tasks"
 >
 <b>✓</b>
 Task
 </button>
 
 <button
-data-screen="rank"
+  data-screen="rank"
 >
 <b>🏆</b>
 Rank
@@ -773,219 +840,242 @@ Rank
 </div>
 
 <div
-class="toast"
-id="toast"
+  class="toast"
+  id="toast"
 ></div>
 
 
 <script>
 
 const tg =
-window.Telegram?.WebApp;
+  window.Telegram?.WebApp;
 
 if(tg){
 
-tg.ready();
+  tg.ready();
 
-tg.expand();
+  tg.expand();
 
-try{
+  try{
 
-tg.setHeaderColor(
-'#06090f'
-);
+    tg.setHeaderColor(
+      '#06090f'
+    );
 
-tg.setBackgroundColor(
-'#06090f'
-);
+    tg.setBackgroundColor(
+      '#06090f'
+    );
 
-}catch(e){}
+  }catch(e){}
 
 }
 
-const API='';
 
-let profile=null;
-let tasks=[];
-let tapQueue=0;
-let tapTimer=null;
-let loading=false;
+const API = '';
 
-const $=id=>
-document.getElementById(id);
+let profile = null;
 
-const fmt=n=>
-Number(n||0).toLocaleString();
+let tasks = [];
+
+let tapQueue = 0;
+
+let tapTimer = null;
+
+let loading = false;
+
+
+const $ = id =>
+  document.getElementById(id);
+
+
+const fmt = n =>
+  Number(n || 0)
+    .toLocaleString();
+
 
 function toast(msg){
 
-$('toast').textContent=msg;
+  $('toast').textContent =
+    msg;
 
-$('toast').classList.add(
-'show'
-);
+  $('toast').classList.add(
+    'show'
+  );
 
-setTimeout(
-()=>$('toast').classList.remove(
-'show'
-),
-1400
-);
+  setTimeout(
+    () =>
+      $('toast').classList.remove(
+        'show'
+      ),
+    1400
+  );
 
 }
 
 
 async function api(
-path,
-method='GET',
-body=null
+  path,
+  method='GET',
+  body=null
 ){
 
-const headers={
-'X-Telegram-Init-Data':
-tg?.initData||''
-};
+  const headers = {
+    'X-Telegram-Init-Data':
+      tg?.initData || ''
+  };
 
-if(body){
-headers['Content-Type']=
-'application/json';
-}
+  if(body){
 
-const r=await fetch(
-API+path,
-{
-method,
-headers,
-body:body?
-JSON.stringify(body):
-undefined,
-cache:'no-store'
-}
-);
+    headers[
+      'Content-Type'
+    ] =
+      'application/json';
 
-let j={};
+  }
 
-try{
-j=await r.json();
-}catch(e){}
+  const r =
+    await fetch(
+      API + path,
+      {
+        method,
+        headers,
+        body:
+          body
+            ? JSON.stringify(body)
+            : undefined,
+        cache:'no-store'
+      }
+    );
 
-if(
-!r.ok ||
-j.success===false
-){
+  let j = {};
 
-throw new Error(
-j.error ||
-j.message ||
-`Request failed (${r.status})`
-);
+  try{
 
-}
+    j = await r.json();
 
-return j;
+  }catch(e){}
+
+  if(
+    !r.ok ||
+    j.success === false
+  ){
+
+    throw new Error(
+      j.error ||
+      j.message ||
+      `Request failed (${r.status})`
+    );
+
+  }
+
+  return j;
 
 }
 
 
 function setProfile(p){
 
-profile=p;
+  profile = p;
 
-render();
+  render();
 
 }
 
 
 function render(){
 
-if(!profile)return;
+  if(!profile)
+    return;
 
-$('balance').textContent=
-fmt(profile.balance)+
-' WOR';
+  $('balance').textContent =
+    fmt(profile.balance)
+    + ' WOR';
 
-$('level').textContent=
-`Mining Level ${profile.mininglevel} • +${profile.tap_reward} WOR/tap`;
+  $('level').textContent =
+    `Mining Level ${profile.mininglevel} • +${profile.tap_reward} WOR/tap`;
 
-$('power').textContent=
-`+${profile.tap_reward} / tap`;
+  $('power').textContent =
+    `+${profile.tap_reward} / tap`;
 
-$('miningSpeed').textContent=
-`${profile.mining_speed} WOR/sec`;
+  $('miningSpeed').textContent =
+    `${profile.mining_speed} WOR/sec`;
 
-$('energyText').textContent=
-`${fmt(profile.energy)} / ${fmt(profile.energy_capacity)}`;
+  $('energyText').textContent =
+    `${fmt(profile.energy)} / ${fmt(profile.energy_capacity)}`;
 
-const energyPercent=
-Math.max(
-0,
-Math.min(
-100,
-profile.energy/
-profile.energy_capacity*
-100
-)
-);
+  $('energyBar').style.width =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        profile.energy /
+        profile.energy_capacity *
+        100
+      )
+    ) + '%';
 
-$('energyBar').style.width=
-energyPercent+'%';
+  $('refCount').textContent =
+    fmt(profile.refer_count);
 
-$('refCount').textContent=
-fmt(profile.refer_count||0);
+  $('refLink').textContent =
+    `https://t.me/WORMiningBot?start=ref_${profile.telegram_id}`;
 
-$('refLink').textContent=
-`https://t.me/WORMiningBot?start=ref_${profile.telegram_id}`;
+  const first =
+    tg?.initDataUnsafe?.user?.first_name ||
+    '👤';
 
-$('userIcon').textContent=
-(profile.firstname||'W')
-.charAt(0)
-.toUpperCase();
+  $('userIcon').textContent =
+    first
+      .slice(0,1)
+      .toUpperCase() ||
+    '👤';
 
-renderUpgrades();
+  renderUpgrades();
 
 }
 
 
 function renderUpgrades(){
 
-const p=profile;
+  const p = profile;
 
-if(!p)return;
+  if(!p)
+    return;
 
-const cards=[
+  const cards = [
 
-[
-'⚡',
-'Tap Boost',
-'Earn more WOR per tap.',
-`Level ${p.boost_level}`,
-p.next_boost_cost,
-'boost'
-],
+    [
+      '🚀',
+      '⚡ Tap Boost',
+      'Earn more WOR per tap.',
+      `Level ${p.boost_level}`,
+      p.next_boost_cost,
+      'boost'
+    ],
 
-[
-'🔋',
-'Energy Capacity',
-'Increase maximum energy.',
-`Level ${p.energy_level}`,
-p.next_energy_cost,
-'energy'
-],
+    [
+      '🔋',
+      'Energy Capacity',
+      'Increase maximum energy.',
+      `Level ${p.energy_level}`,
+      p.next_energy_cost,
+      'energy'
+    ],
 
-[
-'⛏️',
-'Mining Speed',
-'Earn WOR automatically per second.',
-`Level ${p.mininglevel}`,
-p.next_mining_cost,
-'mining'
-]
+    [
+      '⛏️',
+      'Mining Speed',
+      'Earn WOR automatically per second.',
+      `Level ${p.mininglevel}`,
+      p.next_mining_cost,
+      'mining'
+    ]
 
-];
+  ];
 
-$('upgradeList').innerHTML=
-cards.map(c=>`
-
+  $('upgradeList').innerHTML =
+    cards.map(
+      c => `
 <div class="boost">
 
 <div class="icon">
@@ -999,320 +1089,358 @@ ${c[1]}
 </strong>
 
 <span>
-${c[2]} • ${c[3]} •
+${c[2]}
+•
+${c[3]}
+•
 ${
-c[4]
-?
-`Next upgrade: ${fmt(c[4])} WOR`
-:
-'MAX LEVEL'
+  c[4]
+  ? `Next upgrade: ${fmt(c[4])} WOR`
+  : 'MAX LEVEL'
 }
 </span>
 
 </div>
 
 <button
-${c[4]?'':'disabled'}
-data-upgrade="${c[5]}"
+  ${c[4] ? '' : 'disabled'}
+  data-upgrade="${c[5]}"
 >
-${c[4]?'UPGRADE':'MAX LEVEL'}
+${c[4] ? 'UPGRADE' : 'MAX LEVEL'}
 </button>
 
 </div>
+`
+    ).join('');
 
-`).join('');
-
-document
-.querySelectorAll(
-'[data-upgrade]'
-)
-.forEach(
-b=>
-b.onclick=()=>
-upgrade(
-b.dataset.upgrade
-)
-);
+  document
+    .querySelectorAll(
+      '[data-upgrade]'
+    )
+    .forEach(
+      b =>
+        b.onclick =
+          () =>
+            upgrade(
+              b.dataset.upgrade
+            )
+    );
 
 }
 
 
 async function upgrade(type){
 
-try{
+  try{
 
-const j=await api(
-'/api/upgrade',
-'POST',
-{type}
-);
+    const j =
+      await api(
+        '/api/upgrade',
+        'POST',
+        {type}
+      );
 
-setProfile(
-j.profile
-);
+    setProfile(
+      j.profile
+    );
 
-toast(
-j.message ||
-'Upgrade complete'
-);
+    toast(
+      j.message ||
+      'Upgrade complete'
+    );
 
-}catch(e){
+  }catch(e){
 
-toast(e.message);
+    toast(
+      e.message
+    );
 
-}
+  }
 
 }
 
 
 function showFloat(
-text,
-x,
-y
+  text,
+  x,
+  y
 ){
 
-const el=
-document.createElement(
-'div'
-);
+  const el =
+    document.createElement(
+      'div'
+    );
 
-el.className='float';
+  el.className =
+    'float';
 
-el.textContent=text;
+  el.textContent =
+    text;
 
-el.style.left=
-(x-20)+'px';
+  el.style.left =
+    (x - 20) + 'px';
 
-el.style.top=
-(y-20)+'px';
+  el.style.top =
+    (y - 20) + 'px';
 
-$('mineBtn').appendChild(
-el
-);
+  $('mineBtn')
+    .appendChild(el);
 
-setTimeout(
-()=>el.remove(),
-800
-);
+  setTimeout(
+    () => el.remove(),
+    800
+  );
 
 }
 
+
+/*
+  MULTI-TAP FIX
+
+  Taps are queued even while
+  the previous request is running.
+
+  Maximum server batch:
+  20 taps.
+*/
 
 function queueTap(){
 
-if(!profile||loading)
-return;
+  if(!profile)
+    return;
 
-if(profile.energy<=0){
+  if(profile.energy <= 0){
 
-toast(
-'No energy'
-);
+    toast(
+      'No energy'
+    );
 
-return;
+    return;
 
-}
+  }
 
-tapQueue=
-Math.min(
-20,
-tapQueue+1
-);
+  tapQueue =
+    Math.min(
+      20,
+      tapQueue + 1
+    );
 
-if(!tapTimer)
-tapTimer=
-setTimeout(
-flushTaps,
-55
-);
+  if(!tapTimer){
+
+    tapTimer =
+      setTimeout(
+        flushTaps,
+        55
+      );
+
+  }
 
 }
 
 
 async function flushTaps(){
 
-const count=
-tapQueue;
+  if(loading)
+    return;
 
-tapQueue=0;
+  const count =
+    Math.min(
+      20,
+      tapQueue
+    );
 
-tapTimer=null;
+  tapQueue -= count;
 
-if(!count)
-return;
+  if(!count)
+    return;
 
-loading=true;
+  loading = true;
 
-try{
+  try{
 
-const j=
-await api(
-'/api/tap',
-'POST',
-{count}
-);
+    const j =
+      await api(
+        '/api/tap',
+        'POST',
+        {count}
+      );
 
-if(j.profile)
-setProfile(
-j.profile
-);
+    if(j.profile)
+      setProfile(
+        j.profile
+      );
 
-if(
-tg?.HapticFeedback
-){
+    if(
+      tg?.HapticFeedback
+    ){
 
-tg.HapticFeedback
-.impactOccurred(
-'light'
-);
+      tg.HapticFeedback
+        .impactOccurred(
+          'light'
+        );
 
-}
+    }
 
-}catch(e){
+  }catch(e){
 
-toast(
-e.message
-);
+    tapQueue =
+      Math.min(
+        20,
+        tapQueue + count
+      );
 
-}finally{
+    toast(
+      e.message
+    );
 
-loading=false;
+  }finally{
 
-if(tapQueue>0){
+    loading = false;
 
-tapTimer=
-setTimeout(
-flushTaps,
-55
-);
+    if(tapQueue > 0){
 
-}
+      tapTimer =
+        setTimeout(
+          flushTaps,
+          25
+        );
 
-}
+    }else{
+
+      tapTimer = null;
+
+    }
+
+  }
 
 }
 
 
 $('mineBtn')
-.addEventListener(
-'pointerdown',
-e=>{
+  .addEventListener(
+    'pointerdown',
+    e => {
 
-e.preventDefault();
+      e.preventDefault();
 
-try{
+      if(
+        e.pointerId !==
+        undefined
+      ){
 
-if(
-e.pointerId!==undefined
-){
+        try{
 
-$('mineBtn')
-.setPointerCapture(
-e.pointerId
-);
+          $('mineBtn')
+            .setPointerCapture(
+              e.pointerId
+            );
 
-}
+        }catch(x){}
 
-}catch(x){}
+      }
 
-queueTap();
+      queueTap();
 
-showFloat(
-'+'+
-(profile?.tap_reward||1),
-e.offsetX||
-$('mineBtn')
-.clientWidth/2,
-e.offsetY||
-$('mineBtn')
-.clientHeight/2
-);
+      showFloat(
+        '+' +
+        (
+          profile?.tap_reward ||
+          1
+        ),
+        e.offsetX ||
+          $('mineBtn')
+            .clientWidth /
+          2,
+        e.offsetY ||
+          $('mineBtn')
+            .clientHeight /
+          2
+      );
 
-},
-{passive:false}
-);
+    },
+    {
+      passive:false
+    }
+  );
 
 
 async function loadProfile(){
 
-try{
+  try{
 
-const j=
-await api(
-'/api/profile'
-);
+    const j =
+      await api(
+        '/api/profile'
+      );
 
-setProfile(
-j.profile
-);
+    setProfile(
+      j.profile
+    );
 
-$('homeNotice')
-.style.display=
-'none';
+    $('homeNotice')
+      .style.display =
+      'none';
 
-}catch(e){
+  }catch(e){
 
-$('homeNotice')
-.style.display=
-'block';
+    $('homeNotice')
+      .style.display =
+      'block';
 
-$('homeNotice')
-.textContent=
-'Open WORCOIN from Telegram to load your secure balance.';
+    $('homeNotice')
+      .textContent =
+      'Open WORCOIN from Telegram to load your secure balance.';
 
-toast(
-e.message
-);
+    toast(
+      e.message
+    );
 
-}
+  }
 
 }
 
 
 async function loadTasks(){
 
-const list=
-$('taskList');
+  const list =
+    $('taskList');
 
-list.innerHTML=
-'<div class="empty">Loading tasks…</div>';
+  list.innerHTML =
+    '<div class="empty">Loading tasks…</div>';
 
-try{
+  try{
 
-const j=
-await api(
-'/api/tasks'
-);
+    const j =
+      await api(
+        '/api/tasks'
+      );
 
-tasks=
-j.tasks||[];
+    tasks =
+      j.tasks || [];
 
-renderTasks();
+    renderTasks();
 
-}catch(e){
+  }catch(e){
 
-renderTasks();
+    list.innerHTML =
+      `<div class="empty">${esc(e.message)}</div>`;
 
-toast(
-'Could not load database tasks'
-);
-
-}
+  }
 
 }
 
 
 function renderTasks(){
 
-const dailyDone=
-profile?.last_daily_at &&
-new Date(
-profile.last_daily_at
-).toDateString()
-===
-new Date().toDateString();
+  const dailyDone =
+    profile?.last_daily_at &&
+    new Date(
+      profile.last_daily_at
+    ).toDateString() ===
+    new Date()
+      .toDateString();
 
-let html=`
+  let html = `
 
 <div class="task">
 
@@ -1333,17 +1461,16 @@ Claim once per day • +100 WOR
 </div>
 
 <button
-class="pill ${dailyDone?'done':''}"
-id="dailyBtn"
+  class="pill ${dailyDone ? 'done' : ''}"
+  id="dailyBtn"
 >
-${dailyDone?'CLAIMED':'CLAIM'}
+${dailyDone ? 'CLAIMED' : 'CLAIM'}
 </button>
 
 </div>
-
 `;
 
-html+=`
+  html += `
 
 <div class="task">
 
@@ -1354,7 +1481,7 @@ html+=`
 <div class="info">
 
 <strong>
-Join WORCOIN Channel
+Join Channel
 </strong>
 
 <span>
@@ -1364,31 +1491,32 @@ Join @owlcoin137 and verify • +500 WOR
 </div>
 
 <button
-class="pill ${profile?.channel_claimed?'done':''}"
-id="channelBtn"
+  class="pill ${
+    profile?.channel_claimed
+      ? 'done'
+      : ''
+  }"
+  id="channelBtn"
 >
 ${
-profile?.channel_claimed
-?
-'CLAIMED'
-:
-(window._channelOpened
-?
-'VERIFY & CLAIM'
-:
-'JOIN CHANNEL')
+  profile?.channel_claimed
+    ? 'CLAIMED'
+    : (
+        window._channelOpened
+          ? 'VERIFY & CLAIM'
+          : 'JOIN & VERIFY'
+      )
 }
 </button>
 
 </div>
-
 `;
 
-for(
-const t of tasks
-){
+  for(
+    const t of tasks
+  ){
 
-html+=`
+    html += `
 
 <div class="task">
 
@@ -1403,226 +1531,225 @@ ${esc(t.title)}
 </strong>
 
 <span>
-${esc(t.description||'')}
-• +${fmt(t.reward)} WOR
+${esc(t.description || '')}
+•
++${fmt(t.reward)} WOR
 </span>
 
 </div>
 
 ${
-t.task_url
-?
-`
+  t.task_url
+  ? `
 <button
-class="pill"
-data-open="${esc(t.task_url)}"
+  class="pill"
+  data-open="${esc(t.task_url)}"
 >
 OPEN
 </button>
 `
-:
-''
+  : ''
 }
 
 </div>
-
 `;
 
-}
+  }
 
-$('taskList').innerHTML=
-html;
+  $('taskList')
+    .innerHTML =
+    html;
 
-const dailyBtn=
-$('dailyBtn');
+  $('dailyBtn')
+    .onclick =
+    claimDaily;
 
-if(dailyBtn)
-dailyBtn.onclick=
-claimDaily;
+  $('channelBtn')
+    .onclick =
+    claimChannel;
 
-const channelBtn=
-$('channelBtn');
-
-if(channelBtn)
-channelBtn.onclick=
-claimChannel;
-
-document
-.querySelectorAll(
-'[data-open]'
-)
-.forEach(
-b=>
-b.onclick=()=>
-tg?.openTelegramLink
-?
-tg.openTelegramLink(
-b.dataset.open
-)
-:
-window.open(
-b.dataset.open,
-'_blank'
-)
-);
+  document
+    .querySelectorAll(
+      '[data-open]'
+    )
+    .forEach(
+      b =>
+        b.onclick =
+          () =>
+            tg?.openTelegramLink
+              ? tg.openTelegramLink(
+                  b.dataset.open
+                )
+              : window.open(
+                  b.dataset.open,
+                  '_blank'
+                )
+    );
 
 }
 
 
 function esc(v){
 
-return String(
-v??''
-)
-.replace(
-/[&<>"']/g,
-c=>({
-'&':'&amp;',
-'<':'&lt;',
-'>':'&gt;',
-'"':'&quot;',
-"'":'&#39;'
-}[c])
-);
+  return String(
+    v ?? ''
+  ).replace(
+    /[&<>"']/g,
+    c => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[c])
+  );
 
 }
 
 
 async function claimDaily(){
 
-try{
+  try{
 
-const j=
-await api(
-'/api/daily',
-'POST',
-{}
-);
+    const j =
+      await api(
+        '/api/daily',
+        'POST',
+        {}
+      );
 
-setProfile(
-j.profile
-);
+    setProfile(
+      j.profile
+    );
 
-toast(
-j.message||
-'+100 WOR'
-);
+    toast(
+      j.message ||
+      '+100 WOR'
+    );
 
-renderTasks();
+    renderTasks();
 
-}catch(e){
+  }catch(e){
 
-toast(
-e.message
-);
+    toast(
+      e.message
+    );
+
+  }
 
 }
 
-}
 
+/*
+  Channel task is now TWO STEP:
+
+  1. JOIN opens channel.
+  2. VERIFY & CLAIM checks membership
+     on the server.
+*/
 
 async function claimChannel(){
 
-if(
-profile?.channel_claimed
-)
-return;
+  if(
+    profile?.channel_claimed
+  )
+    return;
 
-if(
-!window._channelOpened
-){
+  if(
+    !window._channelOpened
+  ){
 
-window._channelOpened=
-true;
+    window._channelOpened =
+      true;
 
-if(
-tg?.openTelegramLink
-){
+    if(
+      tg?.openTelegramLink
+    ){
 
-tg.openTelegramLink(
-'https://t.me/owlcoin137'
-);
+      tg.openTelegramLink(
+        'https://t.me/owlcoin137'
+      );
 
-}else{
+    }else{
 
-window.open(
-'https://t.me/owlcoin137',
-'_blank'
-);
+      window.open(
+        'https://t.me/owlcoin137',
+        '_blank'
+      );
 
-}
+    }
 
-toast(
-'Join @owlcoin137, then tap VERIFY & CLAIM'
-);
+    toast(
+      'Join @owlcoin137, then tap VERIFY & CLAIM'
+    );
 
-renderTasks();
+    renderTasks();
 
-return;
+    return;
 
-}
+  }
 
-try{
+  try{
 
-const j=
-await api(
-'/api/channel-claim',
-'POST',
-{}
-);
+    const j =
+      await api(
+        '/api/channel-claim',
+        'POST',
+        {}
+      );
 
-setProfile(
-j.profile
-);
+    setProfile(
+      j.profile
+    );
 
-toast(
-j.message||
-'+500 WOR'
-);
+    toast(
+      j.message ||
+      '+500 WOR'
+    );
 
-renderTasks();
+    renderTasks();
 
-}catch(e){
+  }catch(e){
 
-toast(
-e.message
-);
+    toast(
+      e.message
+    );
 
-}
+  }
 
 }
 
 
 async function loadRank(){
 
-const list=
-$('rankList');
+  const list =
+    $('rankList');
 
-list.innerHTML=
-'<div class="empty">Loading Top 100…</div>';
+  list.innerHTML =
+    '<div class="empty">Loading Top 100…</div>';
 
-try{
+  try{
 
-const j=
-await api(
-'/api/rank'
-);
+    const j =
+      await api(
+        '/api/rank'
+      );
 
-const rows=
-j.ranking||[];
+    const rows =
+      j.ranking || [];
 
-if(!rows.length){
+    if(!rows.length){
 
-list.innerHTML=
-'<div class="empty">No public miners yet.</div>';
+      list.innerHTML =
+        '<div class="empty">No public miners yet.</div>';
 
-return;
+      return;
 
-}
+    }
 
-list.innerHTML=
-rows.map(
-r=>`
+    list.innerHTML =
+      rows.map(
+        r => `
 
 <div class="rank">
 
@@ -1631,26 +1758,28 @@ r=>`
 </div>
 
 <div class="avatar">
-W
+👤
 </div>
 
 <div class="info">
 
 <strong>
 ${
-esc(
-r.username
-?
-'@'+r.username
-:
-(r.firstname||
-'WORCOIN Miner')
-)
+  esc(
+    r.username
+      ? '@' + r.username
+      : (
+          r.firstname ||
+          'WORCOIN Miner'
+        )
+  )
 }
 </strong>
 
 <span>
-WORCOIN Miner
+Mining Lv.${r.mininglevel}
+•
+Boost Lv.${r.boost_level}
 </span>
 
 </div>
@@ -1660,121 +1789,117 @@ ${fmt(r.balance)} WOR
 </div>
 
 </div>
-
 `
-).join('');
+      ).join('');
 
-}catch(e){
+  }catch(e){
 
-list.innerHTML=
-'<div class="empty">Rank unavailable.</div>';
+    list.innerHTML =
+      `<div class="empty">${esc(e.message)}</div>`;
 
-toast(
-e.message
-);
-
-}
+  }
 
 }
 
 
 $('shareBtn')
-.onclick=()=>{
+  .onclick =
+  () => {
 
-const link=
-`https://t.me/WORMiningBot?start=ref_${
-profile?.telegram_id||''
-}`;
+    const link =
+      `https://t.me/WORMiningBot?start=ref_${
+        profile?.telegram_id || ''
+      }`;
 
-if(
-tg?.openTelegramLink
-){
+    if(
+      tg?.openTelegramLink
+    ){
 
-tg.openTelegramLink(
-'https://t.me/share/url?url='+
-encodeURIComponent(link)+
-'&text='+
-encodeURIComponent(
-'Join WORCOIN Mining!'
-)
-);
+      tg.openTelegramLink(
+        'https://t.me/share/url?url=' +
+        encodeURIComponent(link) +
+        '&text=' +
+        encodeURIComponent(
+          'Join WORCOIN Mining!'
+        )
+      );
 
-}else{
+    }else{
 
-navigator.clipboard?.writeText(
-link
-);
+      navigator.clipboard?.writeText(
+        link
+      );
 
-}
+    }
 
-toast(
-'Invite link ready'
-);
+    toast(
+      'Invite link ready'
+    );
 
-};
+  };
 
-
-document
-.querySelectorAll(
-'.nav button'
-)
-.forEach(
-btn=>
-btn.onclick=()=>{
 
 document
-.querySelectorAll(
-'.nav button'
-)
-.forEach(
-b=>
-b.classList.remove(
-'active'
-)
-);
+  .querySelectorAll(
+    '.nav button'
+  )
+  .forEach(
+    btn =>
+      btn.onclick =
+        () => {
 
-document
-.querySelectorAll(
-'.screen'
-)
-.forEach(
-s=>
-s.classList.remove(
-'active'
-)
-);
+          document
+            .querySelectorAll(
+              '.nav button'
+            )
+            .forEach(
+              b =>
+                b.classList.remove(
+                  'active'
+                )
+            );
 
-btn.classList.add(
-'active'
-);
+          document
+            .querySelectorAll(
+              '.screen'
+            )
+            .forEach(
+              s =>
+                s.classList.remove(
+                  'active'
+                )
+            );
 
-$(
-btn.dataset.screen
-)
-.classList.add(
-'active'
-);
+          btn.classList.add(
+            'active'
+          );
 
-if(
-btn.dataset.screen===
-'tasks'
-){
+          $(
+            btn.dataset.screen
+          ).classList.add(
+            'active'
+          );
 
-loadTasks();
+          if(
+            btn.dataset.screen ===
+            'tasks'
+          ){
 
-}
+            loadTasks();
 
-if(
-btn.dataset.screen===
-'rank'
-){
+          }
 
-loadRank();
+          if(
+            btn.dataset.screen ===
+            'rank'
+          ){
 
-}
+            loadRank();
 
-}
-);
+          }
+
+        }
+  );
 
 
 loadProfile();
