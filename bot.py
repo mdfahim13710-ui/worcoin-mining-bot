@@ -3,11 +3,15 @@ import logging
 from threading import Thread
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from telegram import Update, MenuButtonWebApp, WebAppInfo
+from telegram import Update, MenuButtonWebApp, WebAppInfo, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 TOKEN = os.getenv("BOT_TOKEN", "").strip()
-WEB_APP_URL = os.getenv("WEB_APP_URL", "https://YOUR-USERNAME.github.io/worcoin-mining-bot/").strip()
+# Set WEB_APP_URL in your hosting provider to your real GitHub Pages URL.
+WEB_APP_URL = os.getenv(
+    "WEB_APP_URL",
+    "https://mdfahim13710-ui.github.io/worcoin-mining-bot/",
+).strip()
 PORT = int(os.getenv("PORT", "10000"))
 
 logging.basicConfig(
@@ -36,12 +40,8 @@ def run_health_server():
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [[
-        {"text": "🦉 PLAY WORCOIN", "web_app": {"url": WEB_APP_URL}}
-    ]]
-    # ReplyKeyboardMarkup is imported lazily to keep the import block small.
-    from telegram import ReplyKeyboardMarkup
-    await update.message.reply_text(
+    keyboard = [[KeyboardButton("🦉 PLAY WORCOIN", web_app=WebAppInfo(url=WEB_APP_URL))]]
+    await update.effective_message.reply_text(
         "🪙 WORCOIN Mining Bot\n\nTap, complete tasks, upgrade your miner and climb the leaderboard.",
         reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True),
     )
@@ -63,23 +63,15 @@ async def post_init(app: Application):
 def main():
     if not TOKEN:
         raise RuntimeError("BOT_TOKEN environment variable is missing.")
-    if "YOUR-USERNAME" in WEB_APP_URL:
-        logger.warning("WEB_APP_URL is still using the placeholder value.")
+    if not WEB_APP_URL.startswith("https://") or "YOUR-USERNAME" in WEB_APP_URL:
+        raise RuntimeError("Set WEB_APP_URL to your real HTTPS GitHub Pages URL.")
 
     Thread(target=run_health_server, daemon=True).start()
-
-    app = (
-        Application.builder()
-        .token(TOKEN)
-        .post_init(post_init)
-        .build()
-    )
+    app = Application.builder().token(TOKEN).post_init(post_init).build()
     app.add_handler(CommandHandler("start", start))
-
     logger.info("WORCOIN bot starting...")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
     main()
-
